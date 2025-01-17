@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Arrays;
-//import java.util.arrays;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -13,9 +12,9 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-//        this.board = new ChessPiece[8][8];
-//        for (int i = 1; i < 8; i++){
-//            for (int j = 1; i < 8; j++){
+        //this.board = new ChessPiece[8][8];
+//        for (int i = 1; i <= 8; i++){
+//            for (int j = 1; i <= 8; j++){
 //                board[i][j] = null;
 //            }
 //        }
