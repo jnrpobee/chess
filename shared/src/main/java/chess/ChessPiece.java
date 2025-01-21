@@ -11,7 +11,28 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
+    private final PieceType pieceType;
+    private final ChessGame.TeamColor teamColor;
+
+    public static final String WHITE_PAWN = "P";
+    public static final String WHITE_ROOK = "R";
+    public static final String WHITE_kNIGHT = "KT";
+    public static final String WHITE_BISHOP = "B";
+    public static final String WHITE_QUEEN = "Q";
+    public static final String WHITE_KING = "k";
+    public static final String BLACK_PAWN = "P";
+    public static final String BLACK_ROOK = "R";
+    public static final String BLACK_KNIGHT = "KT";
+    public static final String BLACK_BISHOP = "B";
+    public static final String BLACK_QUEEN = "B";
+    public static final String BLACK_KING = "K";
+
+
+
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.teamColor = pieceColor;
+        this.pieceType = type;
     }
 
     /**
@@ -30,14 +51,15 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+
+        return this.teamColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return this.pieceType;
     }
 
     /**
