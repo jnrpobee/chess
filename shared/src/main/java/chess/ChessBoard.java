@@ -9,10 +9,15 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] board = new ChessPiece[8][8];
+    private ChessPiece[][] board /*= new ChessPiece[8][8]*/;
 
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
+//         for (int i = 1; i <= 8; i++) {
+//             for (int j = 1; j <= 8; j++) {
+//                 this.board[i][j] = null;
+//             }
+//         }
     }
 
     /**
