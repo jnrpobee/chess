@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -71,8 +72,58 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
 
+        Collection<ChessMove> ValidMoves = new HashSet<>();
+
+        ChessPiece piece = board.getPiece(myPosition);
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        //Pawn
+        if(piece.getPieceType() == PieceType.PAWN){
+            pawn(piece, myPosition,board, row, col, ValidMoves);
+        }
+
+        //ROOK and Queen
+        if(piece.getPieceType() == PieceType.ROOK || piece.getPieceType() == PieceType.QUEEN){
+            rook_n_queen(piece, board, myPosition, row, col, ValidMoves);
+        }
+
+        //knight
+        if(piece.getPieceType() == PieceType.KNIGHT){
+            knight(piece, board, myPosition, row, col, ValidMoves);
+        }
+
+        //bishop and queen
+        if(piece.getPieceType() == PieceType.BISHOP|| piece.getPieceType() == PieceType.QUEEN){
+            bishop_n_queen(piece, board, myPosition, row, col, ValidMoves);
+        }
+        
+        //king
+        if(piece.getPieceType() == PieceType.KING){
+            king(piece, board, myPosition, row, col, ValidMoves);
+        }
+
+        return ValidMoves;
+
+    }
+
+
+
+    private void king(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+    }
+
+    private void knight(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+    }
+
+    private void bishop_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+    }
+
+    private void rook_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+    }
+
+    private void pawn(ChessPiece piece, ChessPosition myPosition, ChessBoard board, int row, int col, Collection<ChessMove> validMoves) {
     }
 
     @Override
@@ -87,5 +138,13 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceType, teamColor);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceType=" + pieceType +
+                ", teamColor=" + teamColor +
+                '}';
     }
 }
