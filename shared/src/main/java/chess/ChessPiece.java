@@ -18,7 +18,7 @@ public class ChessPiece {
 
     public static final String WHITE_PAWN = "P";
     public static final String WHITE_ROOK = "R";
-    public static final String WHITE_kNIGHT = "KT";
+    public static final String WHITE_KNIGHT = "KT";
     public static final String WHITE_BISHOP = "B";
     public static final String WHITE_QUEEN = "Q";
     public static final String WHITE_KING = "k";
