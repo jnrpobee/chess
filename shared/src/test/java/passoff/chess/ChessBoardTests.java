@@ -19,8 +19,10 @@ public class ChessBoardTests {
         var board = new ChessBoard();
         board.addPiece(position, piece);
 
+        System.out.println(board);
         ChessPiece foundPiece = board.getPiece(position);
 
+        System.out.println("piece:" + piece);
         Assertions.assertEquals(piece.getPieceType(), foundPiece.getPieceType(),
                 "ChessPiece returned by getPiece had the wrong piece type");
         Assertions.assertEquals(piece.getTeamColor(), foundPiece.getTeamColor(),
