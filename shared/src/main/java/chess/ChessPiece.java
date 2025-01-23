@@ -144,7 +144,39 @@ public class ChessPiece {
     }
 
     private void bishop_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
-        
+        // Directions for bishop: top-left, top-right, bottom-left, bottom-right
+        int[][] directions = {
+                {-1, -1}, // top-left
+                {-1, 1},  // top-right
+                {1, -1},  // bottom-left
+                {1, 1}    // bottom-right
+        };
+
+        for (int[] direction : directions) {
+            int currentRow = row;
+            int currentCol = col;
+
+            while (true) {
+                currentRow += direction[0];
+                currentCol += direction[1];
+
+                if (currentRow < 1 || currentRow > 8 || currentCol < 1 || currentCol > 8) {
+                    break; // Out of bounds
+                }
+
+                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
+                ChessPiece targetPiece = board.getPiece(newPosition);
+
+                if (targetPiece == null) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, null)); // Empty square
+                } else {
+                    if (targetPiece.getTeamColor() != piece.getTeamColor()) {
+                        validMoves.add(new ChessMove(myPosition, newPosition, null)); // Capture opponent's piece
+                    }
+                    break; // Stop at the first piece encountered
+                }
+            }
+        }
     }
 
 
@@ -209,5 +241,25 @@ public class ChessPiece {
                 "pieceType=" + pieceType +
                 ", teamColor=" + teamColor +
                 '}';
+    }
+
+    public static void main(String[] args) {
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        printBoard(board);
+    }
+
+    public static void printBoard(ChessBoard board) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(i + 1, j + 1));
+                if (piece != null) {
+                    System.out.print(piece.getPieceType().toString().charAt(0) + " ");
+                } else {
+                    System.out.print(". ");
+                }
+            }
+            System.out.println();
+        }
     }
 }
