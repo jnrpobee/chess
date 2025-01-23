@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -16,21 +15,19 @@ public class ChessPiece {
     private final PieceType pieceType;
     private final ChessGame.TeamColor teamColor;
 
-    public static final String WHITE_PAWN = "P";
-    public static final String WHITE_ROOK = "R";
-    public static final String WHITE_KNIGHT = "N";
-    public static final String WHITE_BISHOP = "B";
-    public static final String WHITE_QUEEN = "Q";
-    public static final String WHITE_KING = "k";
-    public static final String BLACK_PAWN = "P";
-    public static final String BLACK_ROOK = "R";
-    public static final String BLACK_KNIGHT = "N";
-    public static final String BLACK_BISHOP = "B";
-    public static final String BLACK_QUEEN = "B";
-    public static final String BLACK_KING = "K";
-
-
-
+//    public static final String WHITE_PAWN = "P";
+//    public static final String WHITE_ROOK = "R";
+//    public static final String WHITE_KNIGHT = "N";
+//    public static final String WHITE_BISHOP = "B";
+//    public static final String WHITE_QUEEN = "Q";
+//    public static final String WHITE_KING = "k";
+//    public static final String BLACK_PAWN = "P";
+//    public static final String BLACK_ROOK = "R";
+//    public static final String BLACK_KNIGHT = "N";
+//    public static final String BLACK_BISHOP = "B";
+//    public static final String BLACK_QUEEN = "B";
+//    public static final String BLACK_KING = "K";
+    
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.teamColor = pieceColor;
@@ -62,6 +59,10 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return this.pieceType;
+    }
+
+    private boolean cover(ChessPosition myPosition) {
+        return myPosition.getRow() >= 1 && myPosition.getRow() <= 8 && myPosition.getColumn() >= 1 && myPosition.getColumn() <= 8;
     }
 
     /**
@@ -108,8 +109,6 @@ public class ChessPiece {
         return ValidMoves;
 
     }
-
-
 
     private void king(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
         ChessPosition newPosition;
@@ -193,8 +192,6 @@ public class ChessPiece {
         }
     }
 
-
-
     private void rook_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
         // Directions for rook: up, down, left, right
         int[][] directions = {
@@ -233,8 +230,37 @@ public class ChessPiece {
     }
 
     private void pawn(ChessPiece piece, ChessPosition myPosition, ChessBoard board, int row, int col, Collection<ChessMove> validMoves) {
+        ChessPosition newPosition; // New position for the pawn
+        PieceType[] promotionTypes = {PieceType.QUEEN, PieceType.KNIGHT, PieceType.ROOK, PieceType.BISHOP}; // Promotion types
+
+        int direction = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? -1 : 1; // Direction of the pawn
+        int startRow = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? 7 : 2; // Starting row of the pawn
+        int promotionRow = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? 2 : 7; // Promotion row of the pawn
+        boolean canPromote = row == promotionRow;
+
+        // Move forward
+        newPosition = new ChessPosition(row + direction, col);
+        if (board.getPiece(newPosition) == null) {
+            if (canPromote) {
+                for (PieceType type : promotionTypes) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, type));
+                }
+            } else {
+                validMoves.add(new ChessMove(myPosition, newPosition, null));
+                if (row == startRow) {
+                    newPosition = new ChessPosition(row + 2 * direction, col);
+                    if (board.getPiece(newPosition) == null) {
+                        validMoves.add(new ChessMove(myPosition, newPosition, null));
+                    }
+                }
+            }
+        }
+
+        // Capture diagonally
 
     }
+
+
 
     @Override
     public boolean equals(Object o) {
