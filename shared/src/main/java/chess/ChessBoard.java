@@ -115,4 +115,24 @@ public class ChessBoard {
     }
 
 
+    //run the board to ensure things are right
+    public static void main(String[] args) {
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        printBoard(board);
+    }
+
+    public static void printBoard(ChessBoard board) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(i + 1, j + 1));
+                if (piece != null) {
+                    System.out.print(piece.getPieceType().toString().charAt(0) + " ");
+                } else {
+                    System.out.print(". ");
+                }
+            }
+            System.out.println();
+        }
+    }
 }

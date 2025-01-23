@@ -56,20 +56,33 @@ public class ChessMove {
         return parsePosition(getStartPosition()) + " " + parsePosition(getEndPosition());
     }
 
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (obj instanceof ChessMove other) {
+//            return this.startPosition.equals(other.startPosition) &&
+//                    this.endPosition.equals(other.endPosition) &&
+//                    this.promotionPiece == other.promotionPiece;
+//        }
+//        return false;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(startPosition, endPosition, promotionPiece);
+//    }
+
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ChessMove other) {
-            return this.startPosition.equals(other.startPosition) &&
-                    this.endPosition.equals(other.endPosition) &&
-                    this.promotionPiece == other.promotionPiece;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
-        return false;
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
-
-
 }

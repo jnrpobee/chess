@@ -18,13 +18,13 @@ public class ChessPiece {
 
     public static final String WHITE_PAWN = "P";
     public static final String WHITE_ROOK = "R";
-    public static final String WHITE_KNIGHT = "KT";
+    public static final String WHITE_KNIGHT = "N";
     public static final String WHITE_BISHOP = "B";
     public static final String WHITE_QUEEN = "Q";
     public static final String WHITE_KING = "k";
     public static final String BLACK_PAWN = "P";
     public static final String BLACK_ROOK = "R";
-    public static final String BLACK_KNIGHT = "KT";
+    public static final String BLACK_KNIGHT = "N";
     public static final String BLACK_BISHOP = "B";
     public static final String BLACK_QUEEN = "B";
     public static final String BLACK_KING = "K";
@@ -135,12 +135,26 @@ public class ChessPiece {
     }
 
     private void knight(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
-        ChessPosition newPosition;
-        int rowMove;
-        int colMove;
-        int[] direction = {-1, 1};
+        int[][] knightMoves = {
+                {-2, -1}, {-2, 1}, // Up-left, Up-right
+                {-1, -2}, {-1, 2}, // Left-up, Right-up
+                {1, -2}, {1, 2},   // Left-down, Right-down
+                {2, -1}, {2, 1}    // Down-left, Down-right
+        };
 
-        //for (var direction)
+        for (int[] move : knightMoves) {
+            int newRow = row + move[0];
+            int newCol = col + move[1];
+
+            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece targetPiece = board.getPiece(newPosition);
+
+                if (targetPiece == null || targetPiece.getTeamColor() != piece.getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, null));
+                }
+            }
+        }
     }
 
     private void bishop_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
@@ -219,6 +233,7 @@ public class ChessPiece {
     }
 
     private void pawn(ChessPiece piece, ChessPosition myPosition, ChessBoard board, int row, int col, Collection<ChessMove> validMoves) {
+
     }
 
     @Override
@@ -241,25 +256,5 @@ public class ChessPiece {
                 "pieceType=" + pieceType +
                 ", teamColor=" + teamColor +
                 '}';
-    }
-
-    public static void main(String[] args) {
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        printBoard(board);
-    }
-
-    public static void printBoard(ChessBoard board) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(i + 1, j + 1));
-                if (piece != null) {
-                    System.out.print(piece.getPieceType().toString().charAt(0) + " ");
-                } else {
-                    System.out.print(". ");
-                }
-            }
-            System.out.println();
-        }
     }
 }
