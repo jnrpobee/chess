@@ -116,6 +116,7 @@ public class ChessPiece {
         int rowMove;
         int colMove;
         int[] direction = {-1, 0, 1};
+
         for (var up : direction) {
             for (var side : direction) {
                 rowMove = row + up;
@@ -134,12 +135,55 @@ public class ChessPiece {
     }
 
     private void knight(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+        ChessPosition newPosition;
+        int rowMove;
+        int colMove;
+        int[] direction = {-1, 1};
+
+        //for (var direction)
     }
 
     private void bishop_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+        
     }
 
+
+
     private void rook_n_queen(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
+        // Directions for rook: up, down, left, right
+        int[][] directions = {
+                {-1, 0}, // up
+                {1, 0},  // down
+                {0, -1}, // left
+                {0, 1}   // right
+        };
+
+        for (int[] direction : directions) {
+            int currentRow = row;
+            int currentCol = col;
+
+            while (true) {
+                currentRow += direction[0];
+                currentCol += direction[1];
+
+                if (currentRow < 1 || currentRow > 8 || currentCol < 1 || currentCol > 8) {
+                    break; // Out of bounds
+                }
+
+                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
+                ChessPiece targetPiece = board.getPiece(newPosition);
+
+                if (targetPiece == null) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, null)); // Empty square
+                } else {
+                    if (targetPiece.getTeamColor() != piece.getTeamColor()) {
+                        validMoves.add(new ChessMove(myPosition, newPosition, null)); // Capture opponent's piece
+                    }
+                    break; // Stop at the first piece encountered
+                }
+            }
+        }
+
     }
 
     private void pawn(ChessPiece piece, ChessPosition myPosition, ChessBoard board, int row, int col, Collection<ChessMove> validMoves) {
