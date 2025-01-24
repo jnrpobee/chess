@@ -257,7 +257,23 @@ public class ChessPiece {
         }
 
         // Capture diagonally
-
+        int[] diagonalDirections = {1, -1}; // Diagonal directions
+        // Loop through the diagonal directions
+        for (int diagonalDirection : diagonalDirections) {
+            newPosition = new ChessPosition(row + direction, col + diagonalDirection);
+            if (cover(newPosition)) {
+                ChessPiece targetPiece = board.getPiece(newPosition);
+                if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (canPromote) {
+                        for (PieceType type : promotionTypes) {
+                            validMoves.add(new ChessMove(myPosition, newPosition, type));
+                        }
+                    } else {
+                        validMoves.add(new ChessMove(myPosition, newPosition, null));
+                    }
+                }
+            }
+        }
     }
 
 
