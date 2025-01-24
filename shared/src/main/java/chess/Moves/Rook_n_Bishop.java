@@ -7,19 +7,33 @@ import chess.ChessPosition;
 
 import java.util.Collection;
 
-public class Queen implements MovesPiece {
+public class Rook_n_Bishop implements MovesPiece {
     @Override
     public void getMoves(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
-        int[][] directions = {
-                {-1, 0},    //up
-                {1, 0},     //down
-                {0, -1},    //left
-                {0, 1},     //right
+
+        int[][] bishopDirections = {
                 {-1, -1}, // top-left
                 {-1, 1},  // top-right
                 {1, -1},  // bottom-left
                 {1, 1}    // bottom-right
         };
+
+        int[][] rookDirections = {
+                {-1, 0}, // up
+                {1, 0},  // down
+                {0, -1}, // left
+                {0, 1}   // right
+        };
+
+        //int[][] directions = piece.getPieceType() == PieceType.BISHOP ? bishopDirections : rookDirections;
+        //same as below
+        int[][] directions;
+        if(piece.getPieceType() == ChessPiece.PieceType.BISHOP){
+            directions = bishopDirections;
+        }
+        else{
+            directions = rookDirections;
+        }
 
         for (int[] direction : directions) {
             int currentRow = row;
