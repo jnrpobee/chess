@@ -16,7 +16,14 @@ public class Pawn implements MovesPiece {
         ChessPosition newPosition; // New position for the pawn
         ChessPiece.PieceType[] promotionTypes = {ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP}; // Promotion types
 
-        int direction = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? -1 : 1; // Direction of the pawn
+        //int direction = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? -1 : 1; // Direction of the pawn
+        int direction; //Direction of the pawn
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            direction = -1;
+        }
+        else {
+            direction = 1;
+        }
         int startRow = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? 7 : 2; // Starting row of the pawn
         int promotionRow = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? 2 : 7; // Promotion row of the pawn
         boolean canPromote = row == promotionRow;

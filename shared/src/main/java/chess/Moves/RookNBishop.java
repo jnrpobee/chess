@@ -7,7 +7,7 @@ import chess.ChessPosition;
 
 import java.util.Collection;
 
-public class Rook_n_Bishop implements MovesPiece {
+public class RookNBishop implements MovesPiece {
     @Override
     public void getMoves(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
 
