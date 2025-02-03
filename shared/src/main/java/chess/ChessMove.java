@@ -12,7 +12,7 @@ public class ChessMove {
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
-    private static final String[] COLS = {"a", "b", "c", "d", "e", "f", "g", "h"};
+//    private static final String[] COLS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -47,14 +47,14 @@ public class ChessMove {
         return promotionPiece;
     }
 
-    private String parsePosition (ChessPosition pos){
-        return COLS [pos.getColumn()-1] + pos.getRow();
-    }
+//    private String parsePosition (ChessPosition pos){
+//        return COLS [pos.getColumn()-1] + pos.getRow();
+//    }
 
-    @Override
-    public String toString() {
-        return parsePosition(getStartPosition()) + " " + parsePosition(getEndPosition());
-    }
+//    @Override
+//    public String toString() {
+//        return parsePosition(getStartPosition()) + " " + parsePosition(getEndPosition());
+//    }
 
     @Override
     public boolean equals(Object o) {
