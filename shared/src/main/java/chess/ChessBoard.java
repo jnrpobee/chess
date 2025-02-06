@@ -37,6 +37,10 @@ public class ChessBoard {
 
     }
 
+    public void removePiece(ChessPosition position) {
+        board[position.getRow()-1][position.getColumn()-1] = null;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -124,4 +128,6 @@ public class ChessBoard {
             System.out.println();
         }
     }
+
+
 }

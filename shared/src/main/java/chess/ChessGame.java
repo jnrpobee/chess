@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -13,9 +14,10 @@ public class ChessGame {
     private TeamColor teamTurn;
 
     public ChessGame() {
+        this.teamTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
         this.board.resetBoard();
-        this.teamTurn = TeamColor.WHITE;
+
     }
 
     /**
@@ -40,7 +42,8 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK,
+        NONE
     }
 
     /**
@@ -51,7 +54,24 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> validMoves = new HashSet<>(0);
+
+        if (board.getPiece(startPosition) == null){
+            return validMoves;
+        }else{
+           validMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+            Collection<ChessMove> acceptableMove = new HashSet<>(0);
+            for(var potentialMove : validMoves){
+                ChessPiece piece = board.getPiece(potentialMove.getStartPosition());
+                ChessPiece targetPiece = board.getPiece(potentialMove.getEndPosition());
+
+                board.addPiece(potentialMove.getEndPosition(), piece);
+                board.removePiece(potentialMove.getStartPosition());
+            }
+            return acceptableMove;
+        }
+
+
     }
 
     /**
@@ -104,7 +124,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
 
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -114,6 +134,6 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
 
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
