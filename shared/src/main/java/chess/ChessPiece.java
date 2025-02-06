@@ -23,6 +23,7 @@ public class ChessPiece {
         this.pieceType = type;
     }
 
+
     /**
      * The various different chess piece options
      */
@@ -64,7 +65,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        Collection<ChessMove> ValidMoves = new HashSet<>();
+        Collection<ChessMove> validMoves = new HashSet<>();
 
         ChessPiece piece = board.getPiece(myPosition);
 
@@ -103,9 +104,9 @@ public class ChessPiece {
             //king(piece, board, myPosition, row, col, ValidMoves);
         }
 
-        movesPiece.getMoves(piece, board, myPosition, row, col, ValidMoves);
+        movesPiece.getMoves(piece, board, myPosition, row, col, validMoves);
 
-        return ValidMoves;
+        return validMoves;
 
     }
 
