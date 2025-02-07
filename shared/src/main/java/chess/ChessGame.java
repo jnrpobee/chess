@@ -151,11 +151,11 @@ public class ChessGame {
                 piece = board.getPiece(currentPosition);
                 if(piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
-                    for (ChessMove move : moves) {
+
                         if(move.getEndPosition().equals(kingPlace)){
                             return true;
                         }
-                    }
+
                 }
             }
         }
