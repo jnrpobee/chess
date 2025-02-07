@@ -136,7 +136,28 @@ public class ChessGame {
                     break;
                 }
             }
+            if (kingPlace != null){
+                break;
+            }
         }
+
+        if(kingPlace == null){
+            throw new RuntimeException("King not found");
+        }
+
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                currentPosition = new ChessPosition(i, j);
+                piece = board.getPiece(currentPosition);
+                if(piece != null && piece.getTeamColor() != teamColor){
+                    Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
+                    for (ChessMove move : moves) {
+                        
+                    }
+                }
+            }
+        }
+
         return false;
 //        throw new RuntimeException("Not implemented");
     }
