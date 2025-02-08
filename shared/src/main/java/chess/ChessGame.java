@@ -183,12 +183,23 @@ public class ChessGame {
                     for (ChessMove move : moves){
                         ChessPiece targetPiece = board.getPiece(move.getEndPosition());
 
+                        board.addPiece(move.getEndPosition(), piece);
+                        board. removePiece(move.getStartPosition());
+
+                        if(!isInCheck(teamColor)){
+                            board.addPiece(move.getEndPosition(), piece);
+                            board. addPiece(move.getStartPosition());
+                            return false;
+                        }
+
+                        board.addPiece(move.getEndPosition(), piece);
+                        board. addPiece(move.getStartPosition(), targetPiece);
 
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
 
     /**
