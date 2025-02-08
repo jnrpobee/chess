@@ -113,6 +113,11 @@ public class ChessGame {
             }
             board.removePiece(move.getEndPosition());
         }
+        //handing promotion
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+            this.board.addPiece(move.getEndPosition(), piece);
+        }
 
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
