@@ -116,7 +116,6 @@ public class ChessGame {
             if (targetPiece.getPieceType() == ChessPiece.PieceType.KING) {
                 throw new InvalidMoveException("can't capture the king");
             }
-            board.removePiece(move.getEndPosition());
         }
         //handing promotion
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
@@ -142,16 +141,21 @@ public class ChessGame {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    System.out.println("king of team " + teamColor.toString() + " found ");
                     kingsPlace = currentPosition;
                     break;
                 }
+                //System.out.println(" null " );
             }
-            if (kingsPlace != null) {
+            if (kingsPlace != null)
+            {
+                System.out.println("king place not equal to null " );
                 break;
             }
         }
 
         if (kingsPlace == null) {
+            System.out.println("king place to null " );
             throw new RuntimeException("King not found");
         }
 
@@ -160,11 +164,16 @@ public class ChessGame {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if (piece != null && piece.getTeamColor() != teamColor) {
+                    System.out.println("king of team " + teamColor.toString() );
                     Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
                     for (ChessMove move : moves) {
+                        //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
                         if (move.getEndPosition().equals(kingsPlace)) {
+                            System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
                             return true;
+
                         }
+                        //System.out.println(" return true " );
                     }
                 }
             }
@@ -172,6 +181,7 @@ public class ChessGame {
 
         return false;
 //        throw new RuntimeException("Not implemented");
+        
     }
 
     /**

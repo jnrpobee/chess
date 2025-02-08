@@ -38,6 +38,7 @@ public class ChessBoard {
     }
 
     public void removePiece(ChessPosition position) {
+
         board[position.getRow()-1][position.getColumn()-1] = null;
     }
 
