@@ -127,9 +127,9 @@ public class ChessGame {
         ChessPosition kingsPlace = null;
         ChessPosition currentPosition;
         ChessPiece piece;
-        for(int i = 1; i <= 8; i++){
-            for(int j = 1; j <= 8; j++){
-                currentPosition = new ChessPosition(i, j);
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++){
+                currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if(piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor){
                     kingsPlace = currentPosition;
@@ -145,9 +145,9 @@ public class ChessGame {
             throw new RuntimeException("King not found");
         }
 
-        for (int i = 1; i <= 8; i++){
-            for (int j = 1; j <= 8; j++){
-                currentPosition = new ChessPosition(i, j);
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++){
+                currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if(piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
@@ -187,14 +187,13 @@ public class ChessGame {
                         board. removePiece(move.getStartPosition());
 
                         if(!isInCheck(teamColor)){
-                            board.addPiece(move.getEndPosition(), targetPiece);
                             board.addPiece(move.getStartPosition(), piece);
+                            board.addPiece(move.getEndPosition(), targetPiece);
                             return false;
                         }
 
-                        board.addPiece(move.getEndPosition(), piece);
-                        board. addPiece(move.getStartPosition(), targetPiece);
-
+                        board.addPiece(move.getStartPosition(), piece);
+                        board.addPiece(move.getEndPosition(), targetPiece);
                     }
                 }
             }
@@ -210,8 +209,33 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-//        
-        throw new RuntimeException("Not implemented");
+//        throw new RuntimeException("Not implemented");
+        ChessPosition currentPosition;
+        ChessPiece piece;
+        for (int row = 1; row<= 8; row++){
+            for(int col = 1; col <= 8; col++){
+                currentPosition = new ChessPosition(row, col);
+                piece = board.getPiece(currentPosition);
+                if(piece != null && piece.getTeamColor()== teamColor){
+                    Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
+                    for(ChessMove move : moves){
+                        ChessPiece targetPiece = board.getPiece(move.getEndPosition());
+
+                        board.addPiece(move.getEndPosition(), piece);
+                        board.removePiece(move.getStartPosition());
+
+                        if(!isInCheck(teamColor)){
+                            board.addPiece(move.getStartPosition(), piece);
+                            board.addPiece(move.getEndPosition(), targetPiece);
+                            return false;
+                        }
+                        board.addPiece(move.getStartPosition(), piece);
+                        board.addPiece(move.getEndPosition(), targetPiece);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
