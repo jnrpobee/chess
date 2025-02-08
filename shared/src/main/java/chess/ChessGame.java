@@ -92,6 +92,11 @@ public class ChessGame {
             throw new InvalidMoveException("No piece at start position");
         }
 
+        //checks for the corrects team's turn
+        if (piece.getTeamColor() != this.teamTurn) {
+            throw new InvalidMoveException("wait for your turn");
+        }
+
         if (piece.pieceMoves(board, move.getStartPosition()).stream().noneMatch(M -> M.getEndPosition().equals(move.getEndPosition()))) {
             throw new InvalidMoveException(" An invalid move");
         }
