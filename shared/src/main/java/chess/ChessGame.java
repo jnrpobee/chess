@@ -187,8 +187,8 @@ public class ChessGame {
                         board. removePiece(move.getStartPosition());
 
                         if(!isInCheck(teamColor)){
-                            board.addPiece(move.getEndPosition(), piece);
-                            board. addPiece(move.getStartPosition());
+                            board.addPiece(move.getEndPosition(), targetPiece);
+                            board.addPiece(move.getStartPosition(), piece);
                             return false;
                         }
 
@@ -210,30 +210,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-//        ChessPosition myPosition;
-//        if (teamColor == TeamColor.WHITE) {
-//            for (int i = 1; i <= 8; i++) {
-//                for (int j = 1; j <= 8; j++) {
-//                    myPosition = new ChessPosition(i, j);
-//                    if (board.getPiece(myPosition) != null && board.getPiece(myPosition).getTeamColor() == TeamColor.WHITE) /*? TeamColor.BLACK : TeamColor.WHITE */{
-//                        if (board.getPiece(myPosition).validMoves(myPosition, board).size() != 0) {
-//                            return false;
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            for (int i = 1; i <= 8; i++) {
-//                for (int j = 1; j <= 8; j++) {
-//                    myPosition = new ChessPosition(i, j);
-//                    if (board.getPiece(myPosition) != null && board.getPiece(myPosition).getTeamColor() == TeamColor.BLACK) {
-//                        if (board.getPiece(myPosition).validMoves(myPosition, board).size() != 0) {
-//                            return false;
-//                        }
-//                    }
-//                }
-//            }
-//        }
+//        
         throw new RuntimeException("Not implemented");
     }
 
