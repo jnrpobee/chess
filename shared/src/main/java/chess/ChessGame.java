@@ -141,7 +141,7 @@ public class ChessGame {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                    System.out.println("king of team " + teamColor.toString() + " found ");
+                    //System.out.println("king of team " + teamColor.toString() + " found ");
                     kingsPlace = currentPosition;
                     break;
                 }
@@ -149,13 +149,13 @@ public class ChessGame {
             }
             if (kingsPlace != null)
             {
-                System.out.println("king place not equal to null " );
+                //System.out.println("king place not equal to null " );
                 break;
             }
         }
 
         if (kingsPlace == null) {
-            System.out.println("king place to null " );
+            //System.out.println("king place to null " );
             throw new RuntimeException("King not found");
         }
 
@@ -164,12 +164,12 @@ public class ChessGame {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
                 if (piece != null && piece.getTeamColor() != teamColor) {
-                    System.out.println("king of team " + teamColor.toString() );
+                    //System.out.println("king of team " + teamColor.toString() );
                     Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
                     for (ChessMove move : moves) {
                         //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
                         if (move.getEndPosition().equals(kingsPlace)) {
-                            System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
+                            //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
                             return true;
 
                         }
@@ -181,7 +181,7 @@ public class ChessGame {
 
         return false;
 //        throw new RuntimeException("Not implemented");
-        
+
     }
 
     /**
