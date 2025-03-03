@@ -24,22 +24,22 @@ public class RegisterService {
         return userDAO;
     }
 
-    public AuthData registerUser(RegisterRequest userRequest) throws Exception {
+    public AuthData registerUser(RegisterRequest userRequest) throws DataAccessException {
         if (userRequest.username() == null || userRequest.password() == null || userRequest.email() == null) {
-            throw new Exception(400, "Error: bad request");
+            throw new DataAccessException("Error: bad request");
         }
 
         UserData userData = new UserData(userRequest.username(), userRequest.password(), userRequest.email());
         try {
             if (this.userDAO.isUser(userData)) {
-                throw new Exception(403, "error: already taken");
+                throw new DataAccessException("Error: already taken");
             } else {
                 this.userDAO.createUser(userData);
 
                 return this.authDAO.createAuth(userData);
             }
         } catch (DataAccessException e) {
-            throw new Exception(500, "error");
+            throw new DataAccessException("Error");
         }
 
 
