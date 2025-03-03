@@ -19,14 +19,6 @@ public class LoginService {
         this.authDAO = authDAO;
     }
 
-    public UserDAO getUserDAO() {
-        return userDAO;
-    }
-
-    public AuthDAO getAuthDAO() {
-        return authDAO;
-    }
-
     public AuthData loginUser(LoginRequest loginRequest) throws DataAccessException {
         UserData userData = this.userDAO.getUser(loginRequest.username());
         if (userData == null) {

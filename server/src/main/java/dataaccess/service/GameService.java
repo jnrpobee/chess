@@ -1,10 +1,84 @@
 package dataaccess.service;
 
+import chess.ChessGame;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import dataaccess.handler.CreateRequest;
+import dataaccess.handler.JoinRequest;
+import dataaccess.handler.ListRequest;
+import dataaccess.result.createGameResult;
+import model.AuthData;
 import model.GameData;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+
 public class GameService {
-    public GameData createGame(CreateRequest createNewGame) {
+    private final GameDAO gameDAO;
+    private int gameID = 100000;
+
+    public GameService(GameDAO gameDAO) {
+        this.gameDAO = gameDAO;
+
+    }
+
+
+    public GameData createGame(CreateRequest createNewGame) throws DataAccessException {
+
+        ChessGame game = new ChessGame();
+        GameData newGameData = new GameData(gameID += 1, null, null, createNewGame.gameName(), game);
+        this.gameID += 1;
+
+        //adding the game to the Database
+        this.gameDAO.addGame(newGameData);
+
+        return new createGameResult(gameID);
+
+
+    }
+
+    public GameData getGame(Integer gameID) throws DataAccessException {
+        return gameDAO.getGame(gameID);
+    }
+
+    public void updateGame(GameData game) throws DataAccessException {
+        gameDAO.updateGame(game);
+    }
+
+    public void JoinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
+        GameData game = gameDAO.getGame(joinRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("error : bad request");
+        }
+
+        String whiteUsername = game.whiteUsername();
+        String blackUsername = game.blackUsername();
+
+        if (Objects.equals(joinRequest.playerColor(), "WHITE")) {
+            if (whiteUsername != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            whiteUsername = authData.username();
+        } else if (Objects.equals(joinRequest.playerColor(), "BLACK")) {
+            if (blackUsername != null) {
+                throw new DataAccessException("Error: bad request");
+            }
+            blackUsername = authData.username();
+        } else if (joinRequest.playerColor() != null) {
+            throw new DataAccessException("Error: bad request");
+
+        }
+        GameData createNewGame = new GameData(joinRequest.gameID(), whiteUsername,
+                blackUsername, game.gameName(), game.game());
+
+        gameDAO.updateGame(createNewGame);
+
+
+    }
+
+    public List<GameData> ListGame(ListRequest listRequest) {
 
     }
 }
+

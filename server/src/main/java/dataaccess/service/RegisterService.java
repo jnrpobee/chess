@@ -15,14 +15,7 @@ public class RegisterService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
-
-    public AuthDAO getAuthDAO() {
-        return authDAO;
-    }
-
-    public UserDAO getUserDAO() {
-        return userDAO;
-    }
+    
 
     public AuthData registerUser(RegisterRequest userRequest) throws DataAccessException {
         if (userRequest.username() == null || userRequest.password() == null || userRequest.email() == null) {

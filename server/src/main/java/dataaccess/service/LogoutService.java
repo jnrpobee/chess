@@ -15,11 +15,8 @@ public class LogoutService {
         this.authDAO = authDAO;
     }
 
-//    public AuthDAO getAuthDAO() {
-//        return authDAO;
-//    }
 
-    public void logoutUser(LogoutRequest authToken) {
+    public void logoutUser(LogoutRequest authToken) throws DataAccessException {
         try {
             AuthData authData = authDAO.getAuth(authToken.authToken());
             if (authData == null) {
