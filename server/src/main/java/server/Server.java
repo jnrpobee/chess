@@ -12,6 +12,7 @@ import dataaccess.service.LogoutService;
 import dataaccess.service.RegisterService;
 import model.AuthData;
 import spark.*;
+import dataaccess.*;
 
 
 public class Server {
@@ -28,9 +29,9 @@ public class Server {
 
         Spark.staticFiles.location("web");
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        //Spark.init();
 
-        //endpoint
+        // Register handlers for each endpoint using the method reference syntax
         Spark.post("/user", this::registration);
 
         Spark.post("/session", this::loginUser);
@@ -52,9 +53,9 @@ public class Server {
         return Spark.port();
     }
 
-    private Object registration(Request req, Response res) {
+    private Object registration(Request req, Response res) throws Exception {
         res.type("application/json");
-        var user = new Gson().fromJson(req.body(), RegisterRequest.class)
+        var user = new Gson().fromJson(req.body(), RegisterRequest.class);
         AuthData authData = registerService.registerUser(user);
 
         res.status(200);
@@ -62,15 +63,10 @@ public class Server {
         return new Gson().toJson(authData);
     }
 
-    /**
-     * Logs in new users
-     * @param request HTTP request - body is probed for username and password
-     * @param response HTTP response
-     * @return JSON of the authorization data upon successful login
-     * @throws ResponseException if unsuccessful log in, indicating incorrect password or other errors
-     */
-    private Object loginUser(Request req, Response res) {
+
+    private Object loginUser(Request req, Response res) throws DataAccessException {
         res.type("application/json");
+
         var loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
         AuthData authData = loginService.loginUser(loginRequest);
 
@@ -79,21 +75,17 @@ public class Server {
         return new Gson().toJson(authData);
     }
 
-    /**
-     * Logs out users
-     * @param request HTTP request - body is probed for username and password
-     * @param response HTTP response
-     * @return JSON of the authorization data upon successful logout
-     * @throws ResponseException if unsuccessful log out, indicating incorrect password or other errors
-     */
-    private Object logoutUser(Request req, Response res) {
-        res.type("application/json");
-        var logoutRequest = new Gson().fromJson(req.body(), LogoutRequest.class);
-        AuthData authData = logoutService.logoutUser(logoutRequest);
 
+    //Logs out the user represented by the authToken.
+    private Object logoutUser(Request req, Response res) throws DataAccessException {
+        res.type("application/json");
+        var authToken = new LogoutRequest(req.headers("authorization"));
+        authService.authentication(authToken.authToken());
+        //AuthData authData = logoutService.logoutUser(logoutRequest);
+
+        logoutService.logoutUser(authToken);
         res.status(200);
-        res.body(new Gson().toJson(authData));
-        return new Gson().toJson(authData);
+        return "{}";
     }
 
 }
