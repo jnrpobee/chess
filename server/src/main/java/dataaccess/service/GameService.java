@@ -6,13 +6,13 @@ import dataaccess.GameDAO;
 import dataaccess.handler.CreateRequest;
 import dataaccess.handler.JoinRequest;
 import dataaccess.handler.ListRequest;
-import dataaccess.result.createGameResult;
+import result.GameDataResult;
 import model.AuthData;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -33,7 +33,7 @@ public class GameService {
         //adding the game to the Database
         this.gameDAO.addGame(newGameData);
 
-        return new createGameResult(gameID);
+        return new GameData(gameID, null, null, null, null);
 
 
     }
@@ -47,7 +47,7 @@ public class GameService {
     }
 
     public void JoinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
-        GameData game = gameDAO.getGame(joinRequest.gameID());
+        GameData game = gameDAO.getGame(joinRequest.GameID());
         if (game == null) {
             throw new DataAccessException("error : bad request");
         }
@@ -69,7 +69,7 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
 
         }
-        GameData createNewGame = new GameData(joinRequest.gameID(), whiteUsername,
+        GameData createNewGame = new GameData(joinRequest.GameID(), whiteUsername,
                 blackUsername, game.gameName(), game.game());
 
         gameDAO.updateGame(createNewGame);
@@ -77,7 +77,16 @@ public class GameService {
 
     }
 
-    public List<GameData> ListGame(ListRequest listRequest) {
+    public List<GameDataResult> ListGame(ListRequest listRequest) throws DataAccessException {
+        List<GameData> allGames = gameDAO.getAllGame();
+        List<GameDataResult> gameDataResult = new ArrayList<>();
+        for (var game : allGames) {
+            gameDataResult.add(new GameDataResult(
+                    game.gameID(), game.whiteUsername(),
+                    game.blackUsername(), game.gameName()
+            ));
+        }
+        return gameDataResult;
 
     }
 }

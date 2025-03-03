@@ -5,6 +5,7 @@ import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class MemoryGameDAO implements GameDAO {
     private final HashMap<Integer, GameData> gameList = new HashMap<>();
@@ -25,6 +26,13 @@ public class MemoryGameDAO implements GameDAO {
         return gameList.get(gameID);
     }
 
+    @Override
+    public List<GameData> getAllGame() throws DataAccessException {
+        return (List<GameData>) gameList.values();
+    }
+
+
+    //public List<GameData>
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {

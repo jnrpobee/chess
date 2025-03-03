@@ -12,7 +12,6 @@ import dataaccess.service.ClearService;
 import dataaccess.service.LoginService;
 import dataaccess.service.LogoutService;
 import dataaccess.service.RegisterService;
-import dataaccess.service.AuthService;
 import model.AuthData;
 import dataaccess.service.GameService;
 import spark.*;
@@ -26,7 +25,7 @@ public class Server {
     private final LoginService loginService;
     private final LogoutService logoutService;
     private final ClearService clearService;
-    private final AuthService authService;
+    //private final AuthService authService;
     private final GameService gameService;
     UserDAO userDAO = new MemoryUserDAO();
     AuthDAO authDAO = new MemoryAuthDAO();
@@ -39,7 +38,7 @@ public class Server {
         logoutService = new LogoutService(authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         gameService = new GameService(gameDAO);
-        authService = new AuthService(authDAO);
+        //authService = new AuthService(authDAO);
     }
 
 
@@ -136,9 +135,9 @@ public class Server {
 
 
     //Create game
-    private Object createGame(Request request, Response response) {
+    private Object createGame(Request request, Response response) throws DataAccessException {
         var authToken = request.headers("authorization");
-        authService.authentication(authToken);
+        gameService.authentication(authToken);
 
         var createNewGame = new Gson().fromJson(request.body(), CreateRequest.class);
         GameData gameID = gameService.createGame(createNewGame);
