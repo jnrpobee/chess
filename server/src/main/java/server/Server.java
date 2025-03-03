@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.handler.CreateRequest;
 import dataaccess.handler.LoginRequest;
 import dataaccess.handler.LogoutRequest;
 import dataaccess.handler.RegisterRequest;
@@ -10,10 +11,12 @@ import dataaccess.service.ListGameService;
 import dataaccess.service.LoginService;
 import dataaccess.service.LogoutService;
 import dataaccess.service.RegisterService;
+import dataaccess.service.AuthService;
 import model.AuthData;
+import dataaccess.service.GameService;
 import spark.*;
 import dataaccess.*;
-
+import model.*;
 
 public class Server {
     private RegisterService registerService;
@@ -22,6 +25,8 @@ public class Server {
     private ListGameService listGameService;
     private JoinGameService joinGameService;
     private ClearService clearService;
+    private AuthService authService;
+    private GameService gameService;
 
 
     public int run(int desiredPort) {
@@ -37,12 +42,18 @@ public class Server {
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
 
+        //list game
+        Spark.post("/game", this::createGame);
+
+        Spark.delete("db", this::clearData);
+
 
         Spark.awaitInitialization();
 
 
         return Spark.port();
     }
+
 
     public void stop() {
         Spark.stop();
@@ -82,8 +93,36 @@ public class Server {
         var authToken = new LogoutRequest(req.headers("authorization"));
         authService.authentication(authToken.authToken());
         //AuthData authData = logoutService.logoutUser(logoutRequest);
+        //AuthData authData = logoutService.logoutUser(logoutRequest);
 
         logoutService.logoutUser(authToken);
+        res.status(200);
+        return "{}";
+    }
+
+    //list game
+
+
+    //Create game
+    private Object createGame(Request request, Response response) {
+        var authToken = request.headers("authorization");
+        authService.authentication(authToken);
+
+        var createNewGame = new Gson().fromJson(request.body(), CreateRequest.class);
+        GameData gameID = gameService.createGame(createNewGame);
+
+        response.status(200);
+        response.body(new Gson().toJson(gameID));
+        return new Gson().toJson(gameID);
+    }
+
+
+    // join game
+
+
+    //clear game data
+    private Object clearData(Request req, Response res) throws DataAccessException {
+        clearService.clearDatabase();
         res.status(200);
         return "{}";
     }

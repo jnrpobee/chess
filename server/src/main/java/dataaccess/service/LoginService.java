@@ -29,19 +29,20 @@ public class LoginService {
 
     public AuthData loginUser(LoginRequest loginRequest) throws DataAccessException {
         UserData userData = this.userDAO.getUser(loginRequest.username());
-        if(userData == null){
+        if (userData == null) {
             throw new Exception(401, "error: unauthorized");
         }
         boolean removed = this.authDAO.deleteAuth(userData.username());
-        if(Objects.equals(userData.password(), loginRequest.password())){
+        if (Objects.equals(userData.password(), loginRequest.password())) {
             return this.authDAO.createAuth(userData);
-        }else{
-            throw new Exception(401, "Error: unauthorized")
+        } else {
+            throw new Exception(401, "Error: unauthorized");
         }
 
-        }
-        public String getUser(String authToken) throws DataAccessException{
-            return authDAO.getAuth(authToken).username();
-        }
     }
+
+    public String getUser(String authToken) throws DataAccessException {
+        return authDAO.getAuth(authToken).username();
+    }
+
 }
