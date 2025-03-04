@@ -198,7 +198,7 @@ public class Server {
     private Object clearData(Request request, Response response) throws DataAccessException {
         clearService.clearDatabase();
         response.status(200);
-        return "{ }";
+        return "{}";
     }
 
 }

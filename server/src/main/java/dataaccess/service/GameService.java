@@ -6,7 +6,6 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.handler.CreateRequest;
 import dataaccess.handler.JoinRequest;
-import dataaccess.handler.ListRequest;
 import result.GameDataResult;
 import model.AuthData;
 import model.GameData;
@@ -21,10 +20,6 @@ public class GameService {
     private final AuthDAO authDAO;
     private int gameID = 100000;
 
-//    public GameService(GameDAO gameDAO) {
-//        this.gameDAO = gameDAO;
-//        //this.authDAO = authDAO;
-//    }
 
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
@@ -74,7 +69,7 @@ public class GameService {
             whiteUsername = authData.username();
         } else if (Objects.equals(joinRequest.playerColor(), "BLACK")) {
             if (blackUsername != null) {
-                throw new DataAccessException("Error: bad request");
+                throw new DataAccessException("Error: already taken");
             }
             blackUsername = authData.username();
         } else if (joinRequest.playerColor() != null) {

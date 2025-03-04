@@ -20,14 +20,14 @@ public class LogoutService {
         try {
             AuthData authData = authDAO.getAuth(authToken.authToken());
             if (authData == null) {
-                throw new DataAccessException("error: unauthorized");
+                throw new DataAccessException("Error: unauthorized");
             }
             boolean removed = authDAO.deleteAuth(authData.authToken());
             if (!removed) {
-                throw new DataAccessException("error: unauthorized");
+                throw new DataAccessException("Error: unauthorized");
             }
         } catch (DataAccessException e) {
-            throw new DataAccessException("error: unauthorized");
+            throw new DataAccessException("Error: unauthorized");
         }
     }
 }

@@ -1,5 +1,5 @@
 package server;
 
-public record FailureResponse(String ErrorMessage) {
+public record FailureResponse(String message) {
 
 }
