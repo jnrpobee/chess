@@ -13,7 +13,12 @@ public class Pawn implements MovesPiece {
     @Override
     public void getMoves(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves) {
         ChessPosition newPosition; // New position for the pawn
-        ChessPiece.PieceType[] promotionTypes = {ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP}; // Promotion types
+        ChessPiece.PieceType[] promotionTypes = {
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.BISHOP
+        }; // Promotion types
 
         //int direction = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? -1 : 1; // Direction of the pawn
         int direction; //Direction of the pawn

@@ -209,21 +209,29 @@ public class ChessGame {
         return true;
     }
 
+
+    //checks if a piece can capture the piece that is putting the king in check
     private boolean canCapture(TeamColor teamColor) {
         ChessPiece piece;
         ChessPosition currentPosition;
+        //the for loop is used to iterate through the board to find the piece that is putting the king in check
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
+                //if the piece is not null and the piece is of the same team as the king that is in check then the
+                // piece is checked
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
                     for (ChessMove move : moves) {
                         ChessPiece targetPiece = board.getPiece(move.getEndPosition());
 
+                        //move the piece to the position of the piece that is putting the king in check
                         board.addPiece(move.getEndPosition(), piece);
                         board.removePiece(move.getStartPosition());
 
+                        //if the king is not in check after the move then the piece can capture the piece that is
+                        // putting the king in check
                         if (!isInCheck(teamColor)) {
                             board.addPiece(move.getStartPosition(), piece);
                             board.addPiece(move.getEndPosition(), targetPiece);
