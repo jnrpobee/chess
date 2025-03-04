@@ -22,7 +22,7 @@ public class LoginService {
     public AuthData loginUser(LoginRequest loginRequest) throws DataAccessException {
         UserData userData = this.userDAO.getUser(loginRequest.username());
         if (userData == null) {
-            throw new DataAccessException("error: unauthorized");
+            throw new DataAccessException("Error: unauthorized");
         }
         boolean removed = this.authDAO.deleteAuth(userData.username());
         if (Objects.equals(userData.password(), loginRequest.password())) {

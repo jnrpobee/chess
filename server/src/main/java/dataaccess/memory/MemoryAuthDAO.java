@@ -40,4 +40,9 @@ public class MemoryAuthDAO implements AuthDAO {
             return false;
         }
     }
+
+    @Override
+    public boolean authExists(String authToken) throws DataAccessException {
+        return authTokens.containsKey(authToken);
+    }
 }

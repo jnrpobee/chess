@@ -15,7 +15,7 @@ public class RegisterService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
-    
+
 
     public AuthData registerUser(RegisterRequest userRequest) throws DataAccessException {
         if (userRequest.username() == null || userRequest.password() == null || userRequest.email() == null) {
@@ -32,7 +32,7 @@ public class RegisterService {
                 return this.authDAO.createAuth(userData);
             }
         } catch (DataAccessException e) {
-            throw new DataAccessException("Error");
+            throw new DataAccessException(e.getMessage());
         }
 
 

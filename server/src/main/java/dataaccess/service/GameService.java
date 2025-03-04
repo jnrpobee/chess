@@ -1,6 +1,7 @@
 package dataaccess.service;
 
 import chess.ChessGame;
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.handler.CreateRequest;
@@ -16,11 +17,17 @@ import java.util.Objects;
 
 public class GameService {
     private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
     private int gameID = 100000;
 
-    public GameService(GameDAO gameDAO) {
-        this.gameDAO = gameDAO;
+//    public GameService(GameDAO gameDAO) {
+//        this.gameDAO = gameDAO;
+//        //this.authDAO = authDAO;
+//    }
 
+    public GameService(GameDAO gameDAO, AuthDAO authDAO) {
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
     }
 
 
@@ -77,7 +84,7 @@ public class GameService {
 
     }
 
-    public List<GameDataResult> ListGame(ListRequest listRequest) throws DataAccessException {
+    public List<GameDataResult> ListGame() throws DataAccessException {
         List<GameData> allGames = gameDAO.getAllGame();
         List<GameDataResult> gameDataResult = new ArrayList<>();
         for (var game : allGames) {
@@ -89,5 +96,18 @@ public class GameService {
         return gameDataResult;
 
     }
+
+    public boolean authentication(String authToken) throws DataAccessException {
+        if (!this.authDAO.authExists(authToken)) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        return true;
+    }
+
+    public AuthData getAuthData(String authToken) throws DataAccessException {
+        return authDAO.getAuth(authToken);
+    }
+
+
 }
 
