@@ -1,4 +1,4 @@
 package dataaccess.handler;
 
-public record JoinRequest(Integer GameID, String playerColor) {
+public record JoinRequest(Integer gameID, String playerColor) {
 }

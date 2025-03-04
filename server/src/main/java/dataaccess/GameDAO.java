@@ -2,8 +2,7 @@ package dataaccess;
 
 import model.GameData;
 
-import java.lang.reflect.Array;
-import java.util.List;
+import java.util.Collection;
 
 public interface GameDAO {
     void clear() throws DataAccessException;
@@ -12,7 +11,7 @@ public interface GameDAO {
 
     GameData getGame(int gameId) throws DataAccessException;
 
-    List<GameData> getAllGame() throws DataAccessException;
+    Collection<GameData> getAllGame() throws DataAccessException;
 
     void updateGame(GameData gameData) throws DataAccessException;
 }

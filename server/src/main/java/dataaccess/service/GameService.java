@@ -12,6 +12,7 @@ import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +36,7 @@ public class GameService {
 
         ChessGame game = new ChessGame();
         GameData newGameData = new GameData(gameID += 1, null, null, createNewGame.gameName(), game);
-        this.gameID += 1;
+        //this.gameID ;
 
         //adding the game to the Database
         this.gameDAO.addGame(newGameData);
@@ -54,10 +55,14 @@ public class GameService {
     }
 
     public void JoinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
-        GameData game = gameDAO.getGame(joinRequest.GameID());
-        if (game == null) {
-            throw new DataAccessException("error : bad request");
+        if (joinRequest.gameID() == null) {
+            throw new DataAccessException("Error: bad request");
         }
+        GameData game = gameDAO.getGame(joinRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+
 
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
@@ -76,7 +81,7 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
 
         }
-        GameData createNewGame = new GameData(joinRequest.GameID(), whiteUsername,
+        GameData createNewGame = new GameData(joinRequest.gameID(), whiteUsername,
                 blackUsername, game.gameName(), game.game());
 
         gameDAO.updateGame(createNewGame);
@@ -85,7 +90,7 @@ public class GameService {
     }
 
     public List<GameDataResult> ListGame() throws DataAccessException {
-        List<GameData> allGames = gameDAO.getAllGame();
+        Collection<GameData> allGames = gameDAO.getAllGame();
         List<GameDataResult> gameDataResult = new ArrayList<>();
         for (var game : allGames) {
             gameDataResult.add(new GameDataResult(
