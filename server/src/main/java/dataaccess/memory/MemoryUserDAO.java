@@ -12,21 +12,20 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void clear() throws DataAccessException {
         allUsers.clear();
-
     }
 
     @Override
-    public boolean isUser(UserData userData) throws DataAccessException {
+    public boolean isUser(UserData userData) {
         return allUsers.containsKey(userData.username());
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) {
         return allUsers.get(username);
     }
 
     @Override
-    public void createUser(UserData userData) throws DataAccessException {
+    public void createUser(UserData userData) {
         allUsers.put(userData.username(), userData);
     }
 }

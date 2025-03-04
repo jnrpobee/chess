@@ -17,7 +17,6 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public void addGame(GameData gameData) throws DataAccessException {
-        var gameId = gameData.gameID();
         gameList.put(gameData.gameID(), gameData);
     }
 

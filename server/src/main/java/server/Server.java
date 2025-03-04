@@ -3,35 +3,33 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import dataaccess.handler.*;
-import dataaccess.memory.MemoryAuthDAO;
-import dataaccess.memory.MemoryGameDAO;
-import dataaccess.memory.MemoryUserDAO;
-import dataaccess.service.ClearService;
-import dataaccess.service.LoginService;
-import dataaccess.service.LogoutService;
-import dataaccess.service.RegisterService;
-import model.AuthData;
-import dataaccess.service.GameService;
-import result.GameDataResult;
+import dataaccess.service.*;
+import dataaccess.memory.*;
 import spark.*;
 import dataaccess.*;
 import model.*;
+import model.AuthData;
+import result.GameDataResult;
+
 
 import java.util.List;
 import java.util.Objects;
 
 
 public class Server {
+    //Service instances
     private final RegisterService registerService;
     private final LoginService loginService;
     private final LogoutService logoutService;
     private final ClearService clearService;
     private final GameService gameService;
+
+    //DAO instances
     UserDAO userDAO = new MemoryUserDAO();
     AuthDAO authDAO = new MemoryAuthDAO();
 
-
-    public Server() throws Exception {
+    //Constructor to initialize services
+    public Server() {
         GameDAO gameDAO = new MemoryGameDAO();
         registerService = new RegisterService(userDAO, authDAO);
         loginService = new LoginService(userDAO, authDAO);
@@ -40,10 +38,9 @@ public class Server {
         gameService = new GameService(gameDAO, authDAO);
     }
 
-
+    //Methods to run the server
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
         //This line initializes the server and can be removed once you have a functioning endpoint 
         //Spark.init();
@@ -58,13 +55,11 @@ public class Server {
         Spark.delete("db", this::clearData);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
-
         Spark.awaitInitialization();
-
-
         return Spark.port();
     }
 
+    // Exception handler for DataAccessException
     private void exceptionHandler(DataAccessException e, Request request, Response response) {
         String errorMessage = e.getMessage();
 
@@ -81,19 +76,20 @@ public class Server {
             response.status(500);
             response.body(new Gson().toJson(new FailureResponse(e.getMessage())));
         }
-
     }
 
-
+    // Method to stop the server
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
     }
 
+    // Method to get the current port
     public int port() {
         return Spark.port();
     }
 
+    // Handler for user registration
     private Object registration(Request request, Response response) throws Exception {
         response.type("application/json");
         var user = new Gson().fromJson(request.body(), RegisterRequest.class);
@@ -104,26 +100,21 @@ public class Server {
         return new Gson().toJson(authData);
     }
 
-
+    // Handler for user login
     private Object loginUser(Request request, Response response) throws DataAccessException {
         response.type("application/json");
-
         var loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
-
         AuthData authData = loginService.loginUser(loginRequest);
 
         response.status(200);
-        //response.body(new Gson().toJson(authData));
         return new Gson().toJson(authData);
     }
 
-
-    //Logs out the user represented by the authToken.
+    // Handler for user logout
     private Object logoutUser(Request request, Response response) {
         try {
             response.type("application/json");
             var authToken = new LogoutRequest(request.headers("authorization"));
-
 
             logoutService.logoutUser(authToken);
             response.status(200);
@@ -136,30 +127,26 @@ public class Server {
         }
     }
 
-    //list game
-    private Object getGames(Request request, Response response) throws DataAccessException {
+    // Handler to list games
+    private Object getGames(Request request, Response response) {
         try {
             response.type("application/json");
             var authToken = request.headers("authorization");
             gameService.authentication(authToken);
 
             List<GameDataResult> allGames = gameService.ListGame();
-
             response.status(200);
-            //response.body(new Gson().toJson(new ListRequest(allGames)));
             return new Gson().toJson(new ListRequest(allGames));
         } catch (DataAccessException e) {
             exceptionHandler(e, request, response);
             FailureResponse failureResponse = new FailureResponse(e.getMessage());
             return new Gson().toJson(failureResponse);
         }
-
-        // return "";
     }
 
 
-    //Create game
-    private Object createGame(Request request, Response response) throws DataAccessException {
+    // Handler to create a new game
+    private Object createGame(Request request, Response response) {
         try {
             var authToken = request.headers("authorization");
             gameService.authentication(authToken);
@@ -175,17 +162,15 @@ public class Server {
             FailureResponse failureResponse = new FailureResponse(e.getMessage());
             return new Gson().toJson(failureResponse);
         }
-
     }
 
 
-    // join game
+    // Handler to join an existing game
     private Object joinGame(Request request, Response response) throws DataAccessException {
         var authToken = request.headers("authorization");
         gameService.authentication(authToken);
 
         AuthData authData = gameService.getAuthData(authToken);
-
         var joinData = new Gson().fromJson(request.body(), JoinRequest.class);
         gameService.JoinGame(joinData, authData);
 
@@ -193,12 +178,10 @@ public class Server {
         return "{}";
     }
 
-
-    //clear game data
+    // Handler to clear game data
     private Object clearData(Request request, Response response) throws DataAccessException {
         clearService.clearDatabase();
         response.status(200);
         return "{}";
     }
-
 }
