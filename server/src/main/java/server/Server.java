@@ -17,18 +17,15 @@ import spark.*;
 import dataaccess.*;
 import model.*;
 
-import java.lang.invoke.VarHandle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 public class Server {
     private final RegisterService registerService;
     private final LoginService loginService;
     private final LogoutService logoutService;
     private final ClearService clearService;
-    //private final AuthService authService;
     private final GameService gameService;
     UserDAO userDAO = new MemoryUserDAO();
     AuthDAO authDAO = new MemoryAuthDAO();
@@ -41,7 +38,6 @@ public class Server {
         logoutService = new LogoutService(authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         gameService = new GameService(gameDAO, authDAO);
-        //authService = new AuthService(authDAO);
     }
 
 
@@ -54,15 +50,11 @@ public class Server {
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.post("/user", this::registration);
-
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
-
         Spark.get("/game", this::getGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
-        //join games
-
         Spark.delete("db", this::clearData);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
@@ -76,18 +68,18 @@ public class Server {
     private void exceptionHandler(DataAccessException e, Request request, Response response) {
         String errorMessage = e.getMessage();
 
-        //String s = "Error: bad request";
         if (Objects.equals(errorMessage, "Error: bad request")) {
             response.status(400);
             response.body("{\"message\": \"Error: bad request\"}");
-        } else if
-        (Objects.equals(errorMessage, "Error: already taken")) {
+        } else if (Objects.equals(errorMessage, "Error: already taken")) {
             response.status(403);
             response.body("{ \"message\": \"Error: already taken\" }");
         } else if (Objects.equals(errorMessage, "Error: unauthorized")) {
             response.status(401);
             response.body("{ \"message\": \"Error: unauthorized\" }");
-
+        } else if (Objects.equals(errorMessage, "Error: (description of error)")) {
+            response.status(500);
+            response.body(new Gson().toJson(new FailureResponse(e.getMessage())));
         }
 
     }
@@ -102,13 +94,13 @@ public class Server {
         return Spark.port();
     }
 
-    private Object registration(Request req, Response res) throws Exception {
-        res.type("application/json");
-        var user = new Gson().fromJson(req.body(), RegisterRequest.class);
+    private Object registration(Request request, Response response) throws Exception {
+        response.type("application/json");
+        var user = new Gson().fromJson(request.body(), RegisterRequest.class);
         AuthData authData = registerService.registerUser(user);
 
-        res.status(200);
-        res.body(new Gson().toJson(authData));
+        response.status(200);
+        response.body(new Gson().toJson(authData));
         return new Gson().toJson(authData);
     }
 
@@ -127,15 +119,21 @@ public class Server {
 
 
     //Logs out the user represented by the authToken.
-    private Object logoutUser(Request request, Response response) throws DataAccessException {
-        response.type("application/json");
-        var authToken = new LogoutRequest(request.headers("authorization"));
+    private Object logoutUser(Request request, Response response) {
+        try {
+            response.type("application/json");
+            var authToken = new LogoutRequest(request.headers("authorization"));
 
 
-        logoutService.logoutUser(authToken);
-        response.status(200);
-        JsonElement successResponse = null;
-        return new Gson().toJson(successResponse);
+            logoutService.logoutUser(authToken);
+            response.status(200);
+            JsonElement successResponse = new Gson().toJsonTree(new Object());
+            return new Gson().toJson(successResponse);
+        } catch (DataAccessException e) {
+            exceptionHandler(e, request, response);
+            FailureResponse failureResponse = new FailureResponse(e.getMessage());
+            return new Gson().toJson(failureResponse);
+        }
     }
 
     //list game
@@ -197,10 +195,10 @@ public class Server {
 
 
     //clear game data
-    private Object clearData(Request req, Response res) throws DataAccessException {
+    private Object clearData(Request request, Response response) throws DataAccessException {
         clearService.clearDatabase();
-        res.status(200);
-        return "{}";
+        response.status(200);
+        return "{ }";
     }
 
 }

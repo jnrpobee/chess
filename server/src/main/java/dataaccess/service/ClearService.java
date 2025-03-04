@@ -16,17 +16,6 @@ public class ClearService {
         this.gameDAO = gameDAO;
     }
 
-    public UserDAO getUserDAO() {
-        return userDAO;
-    }
-
-    public AuthDAO getAuthDAO() {
-        return authDAO;
-    }
-
-    public GameDAO getGameDAO() {
-        return gameDAO;
-    }
 
     public void clearDatabase() throws DataAccessException {
         userDAO.clear();

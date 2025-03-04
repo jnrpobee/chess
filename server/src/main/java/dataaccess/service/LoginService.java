@@ -24,7 +24,8 @@ public class LoginService {
         if (userData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        boolean removed = this.authDAO.deleteAuth(userData.username());
+//        boolean removed =
+        this.authDAO.deleteAuth(userData.username());
         if (Objects.equals(userData.password(), loginRequest.password())) {
             return this.authDAO.createAuth(userData);
         } else {
@@ -33,8 +34,8 @@ public class LoginService {
 
     }
 
-    public String getUser(String authToken) throws DataAccessException {
-        return authDAO.getAuth(authToken).username();
-    }
+//    public String getUser(String authToken) throws DataAccessException {
+//        return authDAO.getAuth(authToken).username();
+//    }
 
 }
