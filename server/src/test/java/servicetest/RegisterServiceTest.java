@@ -1,4 +1,4 @@
-package serviceTest;
+package servicetest;
 
 import dataaccess.*;
 import dataaccess.handler.RegisterRequest;

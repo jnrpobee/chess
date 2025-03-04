@@ -1,9 +1,8 @@
-package chess.Moves;
+package chess.moves;
 
 import chess.*;
 
 import java.util.Collection;
-import java.util.List;
 
 public class Pawn implements MovesPiece {
 
@@ -20,8 +19,7 @@ public class Pawn implements MovesPiece {
         int direction; //Direction of the pawn
         if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             direction = -1;
-        }
-        else {
+        } else {
             direction = 1;
         }
         int startRow = piece.getTeamColor() == ChessGame.TeamColor.BLACK ? 7 : 2; // Starting row of the pawn

@@ -134,7 +134,7 @@ public class Server {
             var authToken = request.headers("authorization");
             gameService.authentication(authToken);
 
-            List<GameDataResult> allGames = gameService.ListGame();
+            List<GameDataResult> allGames = gameService.listGame();
             response.status(200);
             return new Gson().toJson(new ListRequest(allGames));
         } catch (DataAccessException e) {
@@ -172,7 +172,7 @@ public class Server {
 
         AuthData authData = gameService.getAuthData(authToken);
         var joinData = new Gson().fromJson(request.body(), JoinRequest.class);
-        gameService.JoinGame(joinData, authData);
+        gameService.joinGame(joinData, authData);
 
         response.status(200);
         return "{}";

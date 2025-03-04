@@ -1,6 +1,6 @@
 package chess;
 
-import chess.Moves.*;
+import chess.moves.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -75,31 +75,31 @@ public class ChessPiece {
         int col = myPosition.getColumn();
 
         //Pawn
-        if(piece.getPieceType() == PieceType.PAWN){
+        if (piece.getPieceType() == PieceType.PAWN) {
             movesPiece = new Pawn();
             //pawn(piece, myPosition,board, row, col, ValidMoves);
         }
 
         //Queen
-        if(piece.getPieceType() == PieceType.QUEEN){
+        if (piece.getPieceType() == PieceType.QUEEN) {
             movesPiece = new Queen();
             //rook_n_queen(piece, board, myPosition, row, col, ValidMoves);
         }
 
         //knight
-        if(piece.getPieceType() == PieceType.KNIGHT){
+        if (piece.getPieceType() == PieceType.KNIGHT) {
             movesPiece = new Knight();
             //knight(piece, board, myPosition, row, col, ValidMoves);
         }
 
         //bishop rook
-        if(piece.getPieceType() == PieceType.BISHOP|| piece.getPieceType() == PieceType.ROOK){
+        if (piece.getPieceType() == PieceType.BISHOP || piece.getPieceType() == PieceType.ROOK) {
             movesPiece = new RookNBishop();
             //bishop_n_queen(piece, board, myPosition, row, col, ValidMoves);
         }
-        
+
         //king
-        if(piece.getPieceType() == PieceType.KING){
+        if (piece.getPieceType() == PieceType.KING) {
             movesPiece = new King();
             //king(piece, board, myPosition, row, col, ValidMoves);
         }

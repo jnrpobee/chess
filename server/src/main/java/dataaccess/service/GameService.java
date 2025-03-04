@@ -1,6 +1,7 @@
 package dataaccess.service;
 
 // Import statements
+
 import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -38,7 +39,7 @@ public class GameService {
     }
 
     // Method to join an existing game
-    public void JoinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
+    public void joinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
         if (joinRequest.gameID() == null || joinRequest.playerColor() == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -69,7 +70,7 @@ public class GameService {
     }
 
     // Method to list all games
-    public List<GameDataResult> ListGame() throws DataAccessException {
+    public List<GameDataResult> listGame() throws DataAccessException {
         Collection<GameData> allGames = gameDAO.getAllGame();
         List<GameDataResult> gameDataResult = new ArrayList<>();
         for (var game : allGames) {

@@ -1,4 +1,4 @@
-package chess.Moves;
+package chess.moves;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -28,10 +28,9 @@ public class RookNBishop implements MovesPiece {
         //int[][] directions = piece.getPieceType() == PieceType.BISHOP ? bishopDirections : rookDirections;
         //same as below
         int[][] directions;
-        if(piece.getPieceType() == ChessPiece.PieceType.BISHOP){
+        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
             directions = bishopDirections;
-        }
-        else{
+        } else {
             directions = rookDirections;
         }
 
