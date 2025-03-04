@@ -97,7 +97,7 @@ public class ChessGame {
             throw new InvalidMoveException("wait for your turn");
         }
 
-        if (piece.pieceMoves(board, move.getStartPosition()).stream().noneMatch(M -> M.getEndPosition().equals(move.getEndPosition()))) {
+        if (piece.pieceMoves(board, move.getStartPosition()).stream().noneMatch(m -> m.getEndPosition().equals(move.getEndPosition()))) {
             throw new InvalidMoveException(" An invalid move");
         }
 
@@ -147,8 +147,7 @@ public class ChessGame {
                 }
                 //System.out.println(" null " );
             }
-            if (kingsPlace != null)
-            {
+            if (kingsPlace != null) {
                 //System.out.println("king place not equal to null " );
                 break;
             }
@@ -163,18 +162,8 @@ public class ChessGame {
             for (int col = 1; col <= 8; col++) {
                 currentPosition = new ChessPosition(row, col);
                 piece = board.getPiece(currentPosition);
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    //System.out.println("king of team " + teamColor.toString() );
-                    Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
-                    for (ChessMove move : moves) {
-                        //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
-                        if (move.getEndPosition().equals(kingsPlace)) {
-                            //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
-                            return true;
-
-                        }
-                        //System.out.println(" return true " );
-                    }
+                if (pieceCanAttackKing(teamColor, piece, currentPosition, kingsPlace)) {
+                    return true;
                 }
             }
         }
@@ -182,6 +171,23 @@ public class ChessGame {
         return false;
 //        throw new RuntimeException("Not implemented");
 
+    }
+
+    private boolean pieceCanAttackKing(TeamColor teamColor, ChessPiece piece, ChessPosition currentPosition, ChessPosition kingsPlace) {
+        if (piece != null && piece.getTeamColor() != teamColor) {
+            //System.out.println("king of team " + teamColor.toString() );
+            Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
+            for (ChessMove move : moves) {
+                //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
+                if (move.getEndPosition().equals(kingsPlace)) {
+                    //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
+                    return true;
+
+                }
+                //System.out.println(" return true " );
+            }
+        }
+        return false;
     }
 
     /**
@@ -192,8 +198,17 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
 //        throw new RuntimeException("Not implemented");
-        ChessPosition currentPosition;
+//        ChessPosition currentPosition= null;
+//        ChessPiece piece = null;
+        if (canCapture(teamColor)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean canCapture(TeamColor teamColor) {
         ChessPiece piece;
+        ChessPosition currentPosition;
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 currentPosition = new ChessPosition(row, col);
@@ -209,7 +224,7 @@ public class ChessGame {
                         if (!isInCheck(teamColor)) {
                             board.addPiece(move.getStartPosition(), piece);
                             board.addPiece(move.getEndPosition(), targetPiece);
-                            return false;
+                            return true;
                         }
 
                         board.addPiece(move.getStartPosition(), piece);
@@ -218,7 +233,7 @@ public class ChessGame {
                 }
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -235,28 +250,8 @@ public class ChessGame {
         }
         ChessPosition currentPosition;
         ChessPiece piece;
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                currentPosition = new ChessPosition(row, col);
-                piece = board.getPiece(currentPosition);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
-                    for (ChessMove move : moves) {
-                        ChessPiece targetPiece = board.getPiece(move.getEndPosition());
-
-                        board.addPiece(move.getEndPosition(), piece);
-                        board.removePiece(move.getStartPosition());
-
-                        if (!isInCheck(teamColor)) {
-                            board.addPiece(move.getStartPosition(), piece);
-                            board.addPiece(move.getEndPosition(), targetPiece);
-                            return false;
-                        }
-                        board.addPiece(move.getStartPosition(), piece);
-                        board.addPiece(move.getEndPosition(), targetPiece);
-                    }
-                }
-            }
+        if (canCapture(teamColor)) {
+            return false;
         }
         return true;
     }

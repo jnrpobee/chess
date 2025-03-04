@@ -4,22 +4,21 @@ import dataaccess.*;
 import dataaccess.handler.RegisterRequest;
 import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryUserDAO;
-import dataaccess.service.LoginService;
 import dataaccess.service.RegisterService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class RegisterServiceTest {
-    static final UserDAO userDAO = new MemoryUserDAO();
-    static final AuthDAO authDAO = new MemoryAuthDAO();
-    static final RegisterService service;
+    static final UserDAO USER_DAO = new MemoryUserDAO();
+    static final AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    static final RegisterService SERVICE;
 
     //static final LoginService service = new LoginService(userDAO, authDAO);
 
     static {
         try {
-            service = new RegisterService(userDAO, authDAO);
+            SERVICE = new RegisterService(USER_DAO, AUTH_DAO);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -27,8 +26,8 @@ public class RegisterServiceTest {
 
     @BeforeEach
     void clear() throws DataAccessException {
-        userDAO.clear();
-        authDAO.clear();
+        USER_DAO.clear();
+        AUTH_DAO.clear();
     }
 
 
@@ -37,7 +36,7 @@ public class RegisterServiceTest {
         RegisterRequest goodRequest = new RegisterRequest(
                 "Name", "Password", "email@email.com");
 
-        Assertions.assertDoesNotThrow(() -> service.registerUser(goodRequest));
+        Assertions.assertDoesNotThrow(() -> SERVICE.registerUser(goodRequest));
 
     }
 
@@ -47,7 +46,7 @@ public class RegisterServiceTest {
                 null, "invalid Password", " invalid Email"
         );
 
-        Assertions.assertThrows(DataAccessException.class, () -> service.registerUser(wrongRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> SERVICE.registerUser(wrongRequest));
     }
 
 
