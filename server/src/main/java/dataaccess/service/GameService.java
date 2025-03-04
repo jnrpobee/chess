@@ -41,16 +41,16 @@ public class GameService {
 
     }
 
-    public GameData getGame(Integer GameID) throws DataAccessException {
-        return gameDAO.getGame(GameID);
-    }
+//    public GameData getGame(Integer GameID) throws DataAccessException {
+//        return gameDAO.getGame(GameID);
+//    }
 
-    public void updateGame(GameData game) throws DataAccessException {
-        gameDAO.updateGame(game);
-    }
+//    public void updateGame(GameData game) throws DataAccessException {
+//        gameDAO.updateGame(game);
+//    }
 
     public void JoinGame(JoinRequest joinRequest, AuthData authData) throws DataAccessException {
-        if (joinRequest.gameID() == null) {
+        if (joinRequest.gameID() == null || joinRequest.playerColor() == null) {
             throw new DataAccessException("Error: bad request");
         }
         GameData game = gameDAO.getGame(joinRequest.gameID());
