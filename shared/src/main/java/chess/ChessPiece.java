@@ -52,10 +52,6 @@ public class ChessPiece {
         return this.pieceType;
     }
 
-//    private boolean cover(ChessPosition myPosition) {
-//        return myPosition.getRow() >= 1 && myPosition.getRow() <= 8 && myPosition.getColumn() >= 1 && myPosition.getColumn() <= 8;
-//    }
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in

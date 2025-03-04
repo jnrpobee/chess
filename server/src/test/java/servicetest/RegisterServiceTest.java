@@ -37,7 +37,6 @@ public class RegisterServiceTest {
                 "Name", "Password", "email@email.com");
 
         Assertions.assertDoesNotThrow(() -> SERVICE.registerUser(goodRequest));
-
     }
 
     @Test
@@ -49,17 +48,4 @@ public class RegisterServiceTest {
         Assertions.assertThrows(DataAccessException.class, () -> SERVICE.registerUser(wrongRequest));
     }
 
-
-    // // Test login service with valid credentials
-    // @BeforeEach
-    // void clear() {
-    //     userDAO.clear();
-    //     authDAO.clear();
-    // }
-
-    // @Test
-    // void testLoginUserPass() {
-    //     AssertionError.assertDoesNotThrow(() -> {
-    //         RegisterRequest goodRequest = new RegisterRequest(
-    //                 "Name", "Password", "
 }

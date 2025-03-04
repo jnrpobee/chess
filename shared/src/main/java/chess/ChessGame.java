@@ -178,9 +178,15 @@ public class ChessGame {
             //System.out.println("king of team " + teamColor.toString() );
             Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
             for (ChessMove move : moves) {
-                //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
+                //System.out.println("\nChecking move: " + move.toString() +
+                // " {start(" + move.getStartPosition().getRow() +
+                // ", " +  move.getStartPosition().getColumn()  + ")
+                // end(" +  move.getEndPosition().getRow() + ", " +
+                // move.getEndPosition().getColumn() + ")}");
                 if (move.getEndPosition().equals(kingsPlace)) {
-                    //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  + ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn() + ")}");
+                    //System.out.println("\nChecking move: " + move.toString() + " {start(" + move.getStartPosition().getRow()  +
+                    // ", " +  move.getStartPosition().getColumn()  + ") end(" +  move.getEndPosition().getRow() + ", " +
+                    // move.getEndPosition().getColumn() + ")}");
                     return true;
 
                 }
@@ -197,9 +203,6 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-//        throw new RuntimeException("Not implemented");
-//        ChessPosition currentPosition= null;
-//        ChessPiece piece = null;
         if (canCapture(teamColor)) {
             return false;
         }
