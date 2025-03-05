@@ -33,12 +33,14 @@ public class Pawn implements MovesPiece {
 
         // Move forward
         newPosition = new ChessPosition(row + direction, col);
+        // Check if the position is empty and the move is valid 
         if (board.getPiece(newPosition) == null) {
             if (canPromote) {
                 for (ChessPiece.PieceType type : promotionTypes) {
                     validMoves.add(new ChessMove(myPosition, newPosition, type));
                 }
             } else {
+                // Add the move to the valid moves list if the position is empty and the move is valid 
                 validMoves.add(new ChessMove(myPosition, newPosition, null));
                 if (row == startRow) {
                     newPosition = new ChessPosition(row + 2 * direction, col);
@@ -49,14 +51,17 @@ public class Pawn implements MovesPiece {
             }
         }
 
-        // Capture diagonally
+        // Capture diagonally  
         int[] diagonalDirections = {1, -1}; // Diagonal directions
         // Loop through the diagonal directions
         for (int diagonalDirection : diagonalDirections) {
             newPosition = new ChessPosition(row + direction, col + diagonalDirection);
+            // Check if the position is empty and the move is valid 
             if (cover(newPosition)) {
                 ChessPiece targetPiece = board.getPiece(newPosition);
-                if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
+                if (targetPiece != null && targetPiece.getTeamColor() != piece.
+                // Add the move to the valid moves list if the position is not empty and the move is valid
+                getTeamColor()) {
                     if (canPromote) {
                         for (ChessPiece.PieceType type : promotionTypes) {
                             validMoves.add(new ChessMove(myPosition, newPosition, type));
