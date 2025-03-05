@@ -64,7 +64,9 @@ public class Pawn implements MovesPiece {
         }
     }
 
-    private static void handleCaptureMove(ChessPiece piece, ChessPosition myPosition, Collection<ChessMove> validMoves, ChessPiece targetPiece, boolean canPromote, ChessPiece.PieceType[] promotionTypes, ChessPosition newPosition) {
+    private static void handleCaptureMove(ChessPiece piece, ChessPosition myPosition, Collection<ChessMove> validMoves,
+                                          ChessPiece targetPiece, boolean canPromote, ChessPiece.PieceType[] promotionTypes,
+                                          ChessPosition newPosition) {
         if (targetPiece != null && targetPiece.getTeamColor() != piece.
                 // Add the move to the valid moves list if the position is not empty and the move is valid
                         getTeamColor()) {
