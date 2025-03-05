@@ -221,27 +221,34 @@ public class ChessGame {
                 piece = board.getPiece(currentPosition);
                 //if the piece is not null and the piece is of the same team as the king that is in check then the
                 // piece is checked
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
-                    for (ChessMove move : moves) {
-                        ChessPiece targetPiece = board.getPiece(move.getEndPosition());
-
-                        //move the piece to the position of the piece that is putting the king in check
-                        board.addPiece(move.getEndPosition(), piece);
-                        board.removePiece(move.getStartPosition());
-
-                        //if the king is not in check after the move then the piece can capture the piece that is
-                        // putting the king in check
-                        if (!isInCheck(teamColor)) {
-                            board.addPiece(move.getStartPosition(), piece);
-                            board.addPiece(move.getEndPosition(), targetPiece);
-                            return true;
-                        }
-
-                        board.addPiece(move.getStartPosition(), piece);
-                        board.addPiece(move.getEndPosition(), targetPiece);
-                    }
+                if (canPieceCaptureThreat(teamColor, piece, currentPosition)) {
+                    return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean canPieceCaptureThreat(TeamColor teamColor, ChessPiece piece, ChessPosition currentPosition) {
+        if (piece != null && piece.getTeamColor() == teamColor) {
+            Collection<ChessMove> moves = piece.pieceMoves(board, currentPosition);
+            for (ChessMove move : moves) {
+                ChessPiece targetPiece = board.getPiece(move.getEndPosition());
+
+                //move the piece to the position of the piece that is putting the king in check
+                board.addPiece(move.getEndPosition(), piece);
+                board.removePiece(move.getStartPosition());
+
+                //if the king is not in check after the move then the piece can capture the piece that is
+                // putting the king in check
+                if (!isInCheck(teamColor)) {
+                    board.addPiece(move.getStartPosition(), piece);
+                    board.addPiece(move.getEndPosition(), targetPiece);
+                    return true;
+                }
+
+                board.addPiece(move.getStartPosition(), piece);
+                board.addPiece(move.getEndPosition(), targetPiece);
             }
         }
         return false;
