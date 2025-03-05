@@ -51,12 +51,7 @@ public class Pawn implements MovesPiece {
             }
         }
 
-        // Capture diagonally  
-        capturingDiagonal(piece, board, myPosition, row, col, validMoves, direction, canPromote, promotionTypes);
-    }
-
-    private void capturingDiagonal(ChessPiece piece, ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> validMoves, int direction, boolean canPromote, ChessPiece.PieceType[] promotionTypes) {
-        ChessPosition newPosition;
+        // Capture diagonally
         int[] diagonalDirections = {1, -1}; // Diagonal directions
         // Loop through the diagonal directions
         for (int diagonalDirection : diagonalDirections) {
@@ -64,17 +59,21 @@ public class Pawn implements MovesPiece {
             // Check if the position is empty and the move is valid
             if (cover(newPosition)) {
                 ChessPiece targetPiece = board.getPiece(newPosition);
-                if (targetPiece != null && targetPiece.getTeamColor() != piece.
-                        // Add the move to the valid moves list if the position is not empty and the move is valid
-                                getTeamColor()) {
-                    if (canPromote) {
-                        for (ChessPiece.PieceType type : promotionTypes) {
-                            validMoves.add(new ChessMove(myPosition, newPosition, type));
-                        }
-                    } else {
-                        validMoves.add(new ChessMove(myPosition, newPosition, null));
-                    }
+                handleCaptureMove(piece, myPosition, validMoves, targetPiece, canPromote, promotionTypes, newPosition);
+            }
+        }
+    }
+
+    private static void handleCaptureMove(ChessPiece piece, ChessPosition myPosition, Collection<ChessMove> validMoves, ChessPiece targetPiece, boolean canPromote, ChessPiece.PieceType[] promotionTypes, ChessPosition newPosition) {
+        if (targetPiece != null && targetPiece.getTeamColor() != piece.
+                // Add the move to the valid moves list if the position is not empty and the move is valid
+                        getTeamColor()) {
+            if (canPromote) {
+                for (ChessPiece.PieceType type : promotionTypes) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, type));
                 }
+            } else {
+                validMoves.add(new ChessMove(myPosition, newPosition, null));
             }
         }
     }
