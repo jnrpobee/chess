@@ -1,4 +1,4 @@
-package servicetest;
+package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -12,7 +12,7 @@ import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class ClearServiceTest {
+class clearServiceTest {
     static final UserDAO USER_DAO = new MemoryUserDAO();
     static final AuthDAO AUTH_DAO = new MemoryAuthDAO();
     static final GameDAO GAME_DAO = new MemoryGameDAO();

@@ -1,4 +1,4 @@
-package servicetest;
+package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.handler.LogoutRequest;
