@@ -12,7 +12,7 @@ import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class clearServiceTest {
+class ClearServiceTest {
     static final UserDAO USER_DAO = new MemoryUserDAO();
     static final AuthDAO AUTH_DAO = new MemoryAuthDAO();
     static final GameDAO GAME_DAO = new MemoryGameDAO();
@@ -21,7 +21,7 @@ class clearServiceTest {
 
 
     @Test
-    void Clear() {
+    void clear() {
         // Test clearing the database
         UserData userData = new UserData("username", "password", "email@email.com");
 
