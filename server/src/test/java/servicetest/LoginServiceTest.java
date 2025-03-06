@@ -26,8 +26,7 @@ public class LoginServiceTest {
 
     @Test
     void testLoginSuccess() throws DataAccessException {
-        // Positive test case for login method
-        UserData userData = new UserData("validName", "validPassword", "valiEmail@email.com");
+        UserData userData = new UserData("validName", "validPassword", "email@email.com");
         USER_DAO.createUser(userData);
         Assertions.assertDoesNotThrow(() -> SERVICE.loginUser(new LoginRequest(userData.username(), userData.password())));
         Assertions.assertInstanceOf(AuthData.class, SERVICE.loginUser(new LoginRequest(userData.username(), userData.password())));
@@ -35,23 +34,7 @@ public class LoginServiceTest {
 
     @Test
     void testLoginFailure() {
-        // Negative test case for login method
         Assertions.assertThrows(DataAccessException.class, () -> SERVICE.loginUser(new LoginRequest("invalidName", "invalidPassword")));
     }
-//
-//    @Test
-//    public void testLogoutSuccess() {
-//        // Positive test case for logout method
-//        loginService.login("validUsername", "validPassword"); // Ensure user is logged in
-//        boolean result = loginService.logout("validUsername");
-//        assertTrue(result, "Logout should succeed for a logged-in user");
-//    }
-//
-//    @Test
-//    public void testLogoutFailure() {
-//        // Negative test case for logout method
-//        boolean result = loginService.logout("invalidUsername");
-//        assertFalse(result, "Logout should fail for a user that is not logged in");
-//    }
 }
 

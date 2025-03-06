@@ -22,14 +22,17 @@ class ClearServiceTest {
 
     @Test
     void Clear() {
+        // Test clearing the database
         UserData userData = new UserData("username", "password", "email@email.com");
 
         try {
+            // Create a user and authenticate
             USER_DAO.createUser(userData);
             AuthData authData = AUTH_DAO.createAuth(userData);
+            // Create a game
             GAME_SERVICE.createGame(new CreateRequest("game"));
 
-
+            // Assert that the user exists in the database
             Assertions.assertDoesNotThrow(() -> USER_DAO.isUser(userData));
             try {
                 Assertions.assertTrue(USER_DAO.isUser(userData));
@@ -37,17 +40,19 @@ class ClearServiceTest {
                 Assertions.fail();
             }
 
+            // Assert that the authentication data is correct
             Assertions.assertEquals(authData, AUTH_DAO.getAuth(authData.authToken()));
 
-
+            // Clear the database
             CLEAR_SERVICE.clearDatabase();
 
-
+            // Assert that the user no longer exists in the database
             try {
                 Assertions.assertFalse(USER_DAO.isUser(userData));
             } catch (DataAccessException ex) {
                 Assertions.fail();
             }
+            // Assert that the authentication data is null
             Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
