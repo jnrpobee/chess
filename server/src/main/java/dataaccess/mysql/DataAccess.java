@@ -1,12 +1,15 @@
-package dataaccess.mySQL;
+package dataaccess.mysql;
 
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 
 import java.sql.SQLException;
 
+/**
+ * DataAccess class for configuring the database.
+ */
 public class DataAccess {
-    private static final String[] createStatements = {
+    private static final String[] CREATE_STATEMENTS = {
             """
         CREATE TABLE IF NOT EXISTS USERS (
             `ID` int NOT NULL AUTO_INCREMENT,
@@ -34,11 +37,16 @@ public class DataAccess {
         """
     };
 
+    /**
+     * Configures the database by creating necessary tables.
+     *
+     * @throws DataAccessException if there is an error configuring the database.
+     */
     public static void configureDatabase() throws DataAccessException {
         try {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
-                for (var statement : createStatements) {
+                for (var statement : CREATE_STATEMENTS) {
                     try (var preparedStatement = conn.prepareStatement(statement)) {
                         preparedStatement.executeUpdate();
                     }
@@ -50,6 +58,4 @@ public class DataAccess {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
-
-
 }

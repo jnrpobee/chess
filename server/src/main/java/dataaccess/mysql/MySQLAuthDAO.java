@@ -1,4 +1,4 @@
-package dataaccess.mySQL;
+package dataaccess.mysql;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -11,21 +11,28 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * MySQLAuthDAO class for handling authentication data access operations.
+ */
 public class MySQLAuthDAO implements AuthDAO {
     private final Connection conn;
 
-
+    /**
+     * Constructor that initializes the database connection.
+     *
+     * @throws DataAccessException if there is an error configuring the database or getting the connection.
+     */
     public MySQLAuthDAO() throws DataAccessException {
         DataAccess.configureDatabase();
         try {
             conn = DatabaseManager.getConnection();
         } catch (DataAccessException e) {
             throw new DataAccessException(e.getMessage());
-            //throw new DataAccessException(500, e.getMessage());
         }
     }
 
-
+    /// Clears the AUTH table.
+    /// throws DataAccessException if there is an error clearing the table.
     @Override
     public void clear() throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE AUTH")) {
@@ -35,6 +42,13 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+    /**
+     * Creates a new authentication token for the given user.
+     *
+     * @param userData the user data.
+     * @return the created AuthData.
+     * @throws DataAccessException if there is an error creating the authentication token.
+     */
     @Override
     public AuthData createAuth(UserData userData) throws DataAccessException {
         var authToken = UUID.randomUUID().toString();
@@ -50,6 +64,13 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+    /**
+     * Retrieves the authentication data for the given token.
+     *
+     * @param authToken the authentication token.
+     * @return the retrieved AuthData.
+     * @throws DataAccessException if there is an error retrieving the authentication data.
+     */
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("SELECT NAME from AUTH where TOKEN=?")) {
@@ -69,6 +90,13 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+    /**
+     * Deletes the authentication token for the given username.
+     *
+     * @param username the username.
+     * @return true if the token was deleted, false otherwise.
+     * @throws DataAccessException if there is an error deleting the authentication token.
+     */
     @Override
     public boolean deleteAuth(String username) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("DELETE FROM AUTH WHERE TOKEN=?")) {
@@ -80,6 +108,13 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+    /**
+     * Checks if the authentication token exists.
+     *
+     * @param authToken the authentication token.
+     * @return true if the token exists, false otherwise.
+     * @throws DataAccessException if there is an error checking the token.
+     */
     @Override
     public boolean authExists(String authToken) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("SELECT TOKEN FROM AUTH WHERE TOKEN=?")) {

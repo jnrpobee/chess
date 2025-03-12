@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import dataaccess.handler.*;
-import dataaccess.mySQL.*;
+import dataaccess.mysql.*;
 
 import dataaccess.service.*;
 import dataaccess.memory.*;

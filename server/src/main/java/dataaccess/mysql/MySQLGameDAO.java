@@ -1,4 +1,4 @@
-package dataaccess.mySQL;
+package dataaccess.mysql;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
@@ -11,12 +11,18 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
+/**
+ * MySQLGameDAO class for handling game data access operations.
+ */
 public class MySQLGameDAO implements GameDAO {
     private final Connection conn;
 
-
+    /**
+     * Constructor that initializes the database connection.
+     *
+     * @throws DataAccessException if there is an error configuring the database or getting the connection.
+     */
     public MySQLGameDAO() throws DataAccessException {
         DataAccess.configureDatabase();
         try {
@@ -26,6 +32,11 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
+    /**
+     * Clears the GAME table.
+     *
+     * @throws DataAccessException if there is an error clearing the table.
+     */
     @Override
     public void clear() throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE GAME")) {
@@ -33,9 +44,14 @@ public class MySQLGameDAO implements GameDAO {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-
     }
 
+    /**
+     * Adds a new game to the GAME table.
+     *
+     * @param gameData the game data.
+     * @throws DataAccessException if there is an error adding the game.
+     */
     @Override
     public void addGame(GameData gameData) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("INSERT INTO GAME (ID, WHITENAME, BLACKNAME, GAMENAME, JSON) VALUES(?, ?, ?, ?, ?)")) {
@@ -49,9 +65,15 @@ public class MySQLGameDAO implements GameDAO {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-
     }
 
+    /**
+     * Retrieves the game data for the given game ID.
+     *
+     * @param gameID the game ID.
+     * @return the retrieved GameData.
+     * @throws DataAccessException if there is an error retrieving the game data.
+     */
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement("SELECT * from GAME where ID=?")) {
@@ -84,6 +106,12 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
+    /**
+     * Retrieves all games from the GAME table.
+     *
+     * @return a collection of all GameData.
+     * @throws DataAccessException if there is an error retrieving the games.
+     */
     @Override
     public Collection<GameData> getAllGame() throws DataAccessException {
         Collection<GameData> gameList = new ArrayList<>();
@@ -116,6 +144,12 @@ public class MySQLGameDAO implements GameDAO {
         return gameList;
     }
 
+    /**
+     * Updates the game data for the given game ID.
+     *
+     * @param gameData the game data.
+     * @throws DataAccessException if there is an error updating the game data.
+     */
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement(
