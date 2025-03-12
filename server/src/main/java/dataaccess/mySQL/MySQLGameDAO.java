@@ -1,6 +1,5 @@
 package dataaccess.mySQL;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -37,7 +36,17 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public void addGame(GameData gameData) throws DataAccessException {
-        
+        try (var preparedStatement = conn.prepareStatement("INSERT INTO GAME (ID, WHITENAME, BLACKNAME, GAMENAME, JSON) VALUES(?, ?, ?, ?, ?)")) {
+            preparedStatement.setString(1, String.valueOf(gameData.gameID()));
+            preparedStatement.setString(2, gameData.whiteUsername());
+            preparedStatement.setString(3, gameData.blackUsername());
+            preparedStatement.setString(4, gameData.gameName());
+            preparedStatement.setString(5, new Gson().toJson(gameData.game()));
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
 
     }
 
