@@ -3,8 +3,8 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import dataaccess.handler.*;
-import dataaccess.mySQL.MySQLAuthDAO;
-import dataaccess.mySQL.MySQLUserDAO;
+import dataaccess.mySQL.*;
+
 import dataaccess.service.*;
 import dataaccess.memory.*;
 import spark.*;
@@ -27,15 +27,18 @@ public class Server {
     private final GameService gameService;
 
     //DAO instances
-    //UserDAO userDAO = new MemoryUserDAO();
-    //AuthDAO authDAO = new MemoryAuthDAO();
-    AuthDAO authDAO;
-    UserDAO userDAO;
-
+    UserDAO userDAO = new MemoryUserDAO();
+    AuthDAO authDAO = new MemoryAuthDAO();
+    GameDAO gameDAO = new MemoryGameDAO();
+//    AuthDAO authDAO;
+//    UserDAO userDAO;
+//    GameDAO gameDAO
+//
 //    {
 //        try {
 //            authDAO = new MySQLAuthDAO();
 //            userDAO = new MySQLUserDAO();
+//            gameDAO = new MySQLGameDAO();
 //        } catch (DataAccessException ex) {
 //            System.out.printf("Unable to connect to database: %s%n", ex.getMessage());
 //        }
@@ -44,7 +47,7 @@ public class Server {
     //Constructor to initialize services
     public Server() {
 
-        GameDAO gameDAO = new MemoryGameDAO();
+        //GameDAO gameDAO = new MemoryGameDAO();
         registerService = new RegisterService(userDAO, authDAO);
         loginService = new LoginService(userDAO, authDAO);
         logoutService = new LogoutService(authDAO);

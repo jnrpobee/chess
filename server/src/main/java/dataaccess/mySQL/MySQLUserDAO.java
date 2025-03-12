@@ -18,7 +18,7 @@ public class MySQLUserDAO implements UserDAO {
         try {
             conn = DatabaseManager.getConnection();
         } catch (DataAccessException e) {
-            throw new DataAccessException(500, e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
     }
 
