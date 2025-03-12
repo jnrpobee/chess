@@ -10,35 +10,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class MySQLAuthDAO implements AuthDAO {
-    private final Connection connect;
+    //private final Connection connect;
 
 
-    public static void configureDatabase() throws DataAccessException {
-        try {
-            DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            } catch (SQLException ex) {
-                throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-            }
-        } catch (DataAccessException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
-
-    public MySQLAuthDAO() throws DataAccessException {
-        configureDatabase();
-        try {
-            connect = DatabaseManager.getConnection();
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
+//    public MySQLAuthDAO() throws DataAccessException {
+//        configureDatabase();
+//        try {
+//            connect = DatabaseManager.getConnection();
+//        } catch (DataAccessException e) {
+//            throw new DataAccessException(e.getMessage());
+//        }
+//    }
 
 
     @Override
