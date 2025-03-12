@@ -27,22 +27,22 @@ public class Server {
     private final GameService gameService;
 
     //DAO instances
-    UserDAO userDAO = new MemoryUserDAO();
-    AuthDAO authDAO = new MemoryAuthDAO();
-    GameDAO gameDAO = new MemoryGameDAO();
-//    AuthDAO authDAO;
-//    UserDAO userDAO;
-//    GameDAO gameDAO
-//
-//    {
-//        try {
-//            authDAO = new MySQLAuthDAO();
-//            userDAO = new MySQLUserDAO();
-//            gameDAO = new MySQLGameDAO();
-//        } catch (DataAccessException ex) {
-//            System.out.printf("Unable to connect to database: %s%n", ex.getMessage());
-//        }
-//    }
+//    UserDAO userDAO = new MemoryUserDAO();
+//    AuthDAO authDAO = new MemoryAuthDAO();
+//    GameDAO gameDAO = new MemoryGameDAO();
+    AuthDAO authDAO;
+    UserDAO userDAO;
+    GameDAO gameDAO;
+
+    {
+        try {
+            authDAO = new MySQLAuthDAO();
+            userDAO = new MySQLUserDAO();
+            gameDAO = new MySQLGameDAO();
+        } catch (DataAccessException ex) {
+            System.out.printf("Unable to connect to database: %s%n", ex.getMessage());
+        }
+    }
 
     //Constructor to initialize services
     public Server() {
