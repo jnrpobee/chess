@@ -66,12 +66,29 @@ public class MySQLGameDAO implements GameDAO {
                             ChessGame.class
                     );
 
-       
+                    return new GameData(
+                            gameID,
+                            whiteUsername,
+                            blackUsername,
+                            gameName,
+                            game
+                    );
+                } else {
+                    return null;
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public Collection<GameData> getAllGame() throws DataAccessException {
+        List<GameData> gameList = new ArrayList<>();
 
+        
         return gameList;
     }
 
