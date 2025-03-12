@@ -44,7 +44,7 @@ public class MySQLAuthDAO implements AuthDAO {
 
             preparedStatement.executeUpdate();
 
-            return new AuthData(userData.username(), authToken);
+            return new AuthData(authToken, userData.username());
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -62,7 +62,7 @@ public class MySQLAuthDAO implements AuthDAO {
                 if (Objects.equals(username, "")) {
                     throw new DataAccessException("invalid authorization token");
                 }
-                return new AuthData(username, authToken);
+                return new AuthData(authToken, username);
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());

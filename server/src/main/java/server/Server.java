@@ -27,9 +27,7 @@ public class Server {
     private final GameService gameService;
 
     //DAO instances
-//    UserDAO userDAO = new MemoryUserDAO();
-//    AuthDAO authDAO = new MemoryAuthDAO();
-//    GameDAO gameDAO = new MemoryGameDAO();
+
     AuthDAO authDAO;
     UserDAO userDAO;
     GameDAO gameDAO;
@@ -41,6 +39,10 @@ public class Server {
             gameDAO = new MySQLGameDAO();
         } catch (DataAccessException ex) {
             System.out.printf("Unable to connect to database: %s%n", ex.getMessage());
+
+            userDAO = new MemoryUserDAO();
+            authDAO = new MemoryAuthDAO();
+            gameDAO = new MemoryGameDAO();
         }
     }
 
@@ -90,7 +92,7 @@ public class Server {
         } else if (Objects.equals(errorMessage, "Error: unauthorized")) {
             response.status(401);
             response.body("{ \"message\": \"Error: unauthorized\" }");
-        } else if (Objects.equals(errorMessage, "Error: (description of error)")) {
+        } else {
             response.status(500);
             response.body(new Gson().toJson(new FailureResponse(e.getMessage())));
         }

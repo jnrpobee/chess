@@ -86,15 +86,50 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> getAllGame() throws DataAccessException {
-        List<GameData> gameList = new ArrayList<>();
+        Collection<GameData> gameList = new ArrayList<>();
 
-        
+        try (var preparedStatement = conn.prepareStatement("SELECT * from GAME")) {
+            try (var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    int gameID = rs.getInt("ID");
+                    var whiteUsername = rs.getString("WHITENAME");
+                    var blackUsername = rs.getString("BLACKNAME");
+                    var gameName = rs.getString("GAMENAME");
+                    var game = new Gson().fromJson(
+                            rs.getString("JSON"),
+                            ChessGame.class
+                    );
+
+                    gameList.add(new GameData(
+                            gameID,
+                            whiteUsername,
+                            blackUsername,
+                            gameName,
+                            game
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
         return gameList;
     }
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
+        try (var preparedStatement = conn.prepareStatement(
+                "UPDATE GAME SET WHITENAME=?, BLACKNAME=?, GAMENAME=?, JSON=? WHERE ID=?")) {
+            preparedStatement.setString(1, gameData.whiteUsername());
+            preparedStatement.setString(2, gameData.blackUsername());
+            preparedStatement.setString(3, gameData.gameName());
+            preparedStatement.setString(4, new Gson().toJson(gameData.game()));
+            preparedStatement.setString(5, String.valueOf(gameData.gameID()));
 
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }
 
