@@ -5,7 +5,7 @@ import dataaccess.DatabaseManager;
 
 import java.sql.SQLException;
 
-public class DataAcess {
+public class DataAccess {
     private static final String[] createStatements = {
             """
         CREATE TABLE IF NOT EXISTS USERS (
