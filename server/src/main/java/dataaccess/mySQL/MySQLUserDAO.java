@@ -43,5 +43,37 @@ public class MySQLUserDAO implements UserDAO {
         }
     }
 
-    
+    @Override
+    public void createUser(UserData userData) throws DataAccessException {
+        try (var preparedStatement = conn.prepareStatement("INSERT INTO USERS (NAME, PASSWORD, EMAIL) VALUE(?, ?, ?)")) {
+            preparedStatement.setString(1, userData.username());
+            preparedStatement.setString(2, userData.password());
+            preparedStatement.setString(3, userData.email());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    @Override
+    public UserData getUser(String username) throws DataAccessException {
+        try (var preparedStatement = conn.prepareStatement("SELECT PASSWORD, EMAIL from USERS where NAME=?")) {
+            preparedStatement.setString(1, username);
+            try (var rs = preparedStatement.executeQuery()) {
+                String password = "";
+                String email = "";
+                while (rs.next()) {
+                    password = rs.getString("PASSWORD");
+                    email = rs.getString("EMAIL");
+                }
+                if (Objects.equals(password, "") && Objects.equals(email, "")) {
+                    return null;
+                }
+                return new UserData(username, password, email);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
 }
