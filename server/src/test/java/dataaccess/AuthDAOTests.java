@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class AuthDAOTests {
-    private static final AuthDAO authDAO;
+    private static final AuthDAO AUTH_DAO;
 
     static {
         try {
-            authDAO = new MySQLAuthDAO();
+            AUTH_DAO = new MySQLAuthDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -23,12 +23,12 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            var authData = authDAO.createAuth(userData);
-            Assertions.assertTrue(authDAO.deleteAuth(authData.authToken()));
+            var authData = AUTH_DAO.createAuth(userData);
+            Assertions.assertTrue(AUTH_DAO.deleteAuth(authData.authToken()));
 
-            Assertions.assertDoesNotThrow(authDAO::clear);
+            Assertions.assertDoesNotThrow(AUTH_DAO::clear);
 
-            Assertions.assertFalse(authDAO.authExists(authData.authToken()));
+            Assertions.assertFalse(AUTH_DAO.authExists(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -41,8 +41,8 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            var authData = authDAO.createAuth(userData);
-            Assertions.assertTrue(authDAO.authExists(authData.authToken()));
+            var authData = AUTH_DAO.createAuth(userData);
+            Assertions.assertTrue(AUTH_DAO.authExists(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -55,7 +55,7 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com"
         );
-        Assertions.assertThrows(DataAccessException.class, () -> authDAO.createAuth(invalidUserData));
+        Assertions.assertThrows(DataAccessException.class, () -> AUTH_DAO.createAuth(invalidUserData));
     }
 
     @Test
@@ -65,9 +65,9 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            var authData = authDAO.createAuth(userData);
+            var authData = AUTH_DAO.createAuth(userData);
 
-            Assertions.assertEquals(authData, authDAO.getAuth(authData.authToken()));
+            Assertions.assertEquals(authData, AUTH_DAO.getAuth(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -80,8 +80,8 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            authDAO.createAuth(userData);
-            Assertions.assertThrows(DataAccessException.class, () -> authDAO.getAuth("random"));
+            AUTH_DAO.createAuth(userData);
+            Assertions.assertThrows(DataAccessException.class, () -> AUTH_DAO.getAuth("random"));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -94,8 +94,8 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            var authData = authDAO.createAuth(userData);
-            Assertions.assertTrue(authDAO.deleteAuth(authData.authToken()));
+            var authData = AUTH_DAO.createAuth(userData);
+            Assertions.assertTrue(AUTH_DAO.deleteAuth(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -103,7 +103,7 @@ public class AuthDAOTests {
 
     @Test
     void negativeDeleteAuth() {
-        Assertions.assertDoesNotThrow(() -> authDAO.deleteAuth(
+        Assertions.assertDoesNotThrow(() -> AUTH_DAO.deleteAuth(
                 "random"));
     }
 
@@ -114,8 +114,8 @@ public class AuthDAOTests {
                 "password",
                 "email@email.com");
         try {
-            var authData = authDAO.createAuth(userData);
-            Assertions.assertTrue(authDAO.authExists(authData.authToken()));
+            var authData = AUTH_DAO.createAuth(userData);
+            Assertions.assertTrue(AUTH_DAO.authExists(authData.authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -124,7 +124,7 @@ public class AuthDAOTests {
     @Test
     void negativeAuthExist() {
         try {
-            Assertions.assertFalse(authDAO.authExists(
+            Assertions.assertFalse(AUTH_DAO.authExists(
                     "randomToken"));
         } catch (DataAccessException e) {
             Assertions.fail();

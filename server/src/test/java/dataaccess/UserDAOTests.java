@@ -9,11 +9,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserDAOTests {
-    private static final UserDAO userDAO;
+    private static final UserDAO USER_DAO;
 
     static {
         try {
-            userDAO = new MySQLUserDAO();
+            USER_DAO = new MySQLUserDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -21,9 +21,9 @@ public class UserDAOTests {
 
     @Test
     void positiveClear() {
-        Assertions.assertDoesNotThrow(userDAO::clear);
+        Assertions.assertDoesNotThrow(USER_DAO::clear);
         try {
-            Assertions.assertFalse(userDAO.isUser(new UserData(
+            Assertions.assertFalse(USER_DAO.isUser(new UserData(
                     "name",
                     "password",
                     "email@email.com"
@@ -36,20 +36,20 @@ public class UserDAOTests {
     @Test
     void positiveIsUser() {
         try {
-            userDAO.createUser(new UserData(
+            USER_DAO.createUser(new UserData(
                     "name",
                     "password",
                     "email@email.com"
             ));
         } catch (DataAccessException ignored) {
         }
-        Assertions.assertDoesNotThrow(() -> userDAO.isUser(new UserData(
+        Assertions.assertDoesNotThrow(() -> USER_DAO.isUser(new UserData(
                 "name",
                 "password",
                 "email@email.com"
         )));
         try {
-            assertTrue(userDAO.isUser(new UserData(
+            assertTrue(USER_DAO.isUser(new UserData(
                     "name",
                     "password",
                     "email@email.com"
@@ -61,13 +61,13 @@ public class UserDAOTests {
 
     @Test
     void negativeIsUser() {
-        Assertions.assertDoesNotThrow(() -> userDAO.isUser(new UserData(
+        Assertions.assertDoesNotThrow(() -> USER_DAO.isUser(new UserData(
                 "wrongName",
                 "wrongPassword",
                 "wrongEmail@email.com"
         )));
         try {
-            Assertions.assertFalse(userDAO.isUser(new UserData(
+            Assertions.assertFalse(USER_DAO.isUser(new UserData(
                     "badName",
                     "badPass",
                     "badEmail@email.com"
@@ -79,7 +79,7 @@ public class UserDAOTests {
 
     @Test
     void positiveCreateUser() {
-        Assertions.assertDoesNotThrow(() -> userDAO.createUser(new UserData(
+        Assertions.assertDoesNotThrow(() -> USER_DAO.createUser(new UserData(
                 "name",
                 "password",
                 "email@email.com")));
@@ -87,7 +87,7 @@ public class UserDAOTests {
 
     @Test
     void negativeCreateUser() {
-        Assertions.assertThrows(DataAccessException.class, () -> userDAO.createUser(new UserData(
+        Assertions.assertThrows(DataAccessException.class, () -> USER_DAO.createUser(new UserData(
                 null,
                 null,
                 null
@@ -100,7 +100,7 @@ public class UserDAOTests {
         String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         //String hashedPassword = String.valueOf(BCrypt.checkpw(userData.password()));
         try {
-            userDAO.createUser(new UserData(
+            USER_DAO.createUser(new UserData(
                     "name",
                     "password",
                     "email@email.com"
@@ -112,7 +112,7 @@ public class UserDAOTests {
     @Test
     void negativeGetUser() {
         try {
-            Assertions.assertNull(userDAO.getUser("wrongName"));
+            Assertions.assertNull(USER_DAO.getUser("wrongName"));
         } catch (DataAccessException e) {
             fail();
         }

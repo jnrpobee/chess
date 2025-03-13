@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 
 public class GameDAOTests {
 
-    private static final GameDAO game_DAO;
+    private static final GameDAO GAME_DAO;
 
     static {
         try {
-            game_DAO = new MySQLGameDAO();
+            GAME_DAO = new MySQLGameDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -23,7 +23,7 @@ public class GameDAOTests {
     void init() {
         GameData gameData = new GameData(1, "first", "second", "theGame", new ChessGame());
         try {
-            game_DAO.addGame(gameData);
+            GAME_DAO.addGame(gameData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -32,13 +32,13 @@ public class GameDAOTests {
     @Test
     void positiveAddGame() {
         GameData gameData = new GameData(1, "first", "second", "theGame", new ChessGame());
-        Assertions.assertDoesNotThrow(() -> game_DAO.addGame(gameData));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.addGame(gameData));
     }
 
     @Test
     void negativeAddGame() {
         GameData gameData = new GameData(1, null, null, "noGame", new ChessGame());
-        Assertions.assertDoesNotThrow(() -> game_DAO.addGame(gameData));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.addGame(gameData));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class GameDAOTests {
         GameData gameData = new GameData(1, "first", "second", "theGame", new ChessGame());
 
         try {
-            var getTheGame = game_DAO.getGame(1);
+            var getTheGame = GAME_DAO.getGame(1);
             Assertions.assertEquals(gameData, getTheGame);
         } catch (DataAccessException e) {
             Assertions.fail();
@@ -56,7 +56,7 @@ public class GameDAOTests {
     @Test
     void negativeGetGame() {
         try {
-            Assertions.assertNull(game_DAO.getGame(2));
+            Assertions.assertNull(GAME_DAO.getGame(2));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -72,15 +72,15 @@ public class GameDAOTests {
                 new ChessGame()
         );
         try {
-            Assertions.assertTrue(game_DAO.getAllGame().contains(gameData));
+            Assertions.assertTrue(GAME_DAO.getAllGame().contains(gameData));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
     }
 
     @Test
-    void NegativeGetAllGame() {
-        Assertions.assertDoesNotThrow(game_DAO::getAllGame);
+    void negativeGetAllGame() {
+        Assertions.assertDoesNotThrow(GAME_DAO::getAllGame);
     }
 
     @Test
@@ -93,8 +93,8 @@ public class GameDAOTests {
                 new ChessGame()
         );
         try {
-            game_DAO.updateGame(gameData);
-            Assertions.assertEquals(gameData, game_DAO.getGame(1));
+            GAME_DAO.updateGame(gameData);
+            Assertions.assertEquals(gameData, GAME_DAO.getGame(1));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -109,16 +109,16 @@ public class GameDAOTests {
                 "theGame",
                 new ChessGame()
         );
-        Assertions.assertDoesNotThrow(() -> game_DAO.updateGame(gameData));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.updateGame(gameData));
     }
 
     @Test
     void positiveClear() {
         try {
-            game_DAO.clear();
+            GAME_DAO.clear();
 
-            Assertions.assertNull(game_DAO.getGame(1));
-            Assertions.assertNull(game_DAO.getGame(2));
+            Assertions.assertNull(GAME_DAO.getGame(1));
+            Assertions.assertNull(GAME_DAO.getGame(2));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
