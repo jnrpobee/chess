@@ -112,10 +112,9 @@ public class AuthDAOTests {
         UserData userData = new UserData(
                 "name",
                 "password",
-                "email@email.com");
+                "email");
         try {
-            var authData = AUTH_DAO.createAuth(userData);
-            Assertions.assertTrue(AUTH_DAO.authExists(authData.authToken()));
+            Assertions.assertTrue(AUTH_DAO.authExists(AUTH_DAO.createAuth(userData).authToken()));
         } catch (DataAccessException e) {
             Assertions.fail();
         }
