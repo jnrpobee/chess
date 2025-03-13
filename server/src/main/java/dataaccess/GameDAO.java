@@ -12,7 +12,7 @@ public interface GameDAO {
     void addGame(GameData gameData) throws DataAccessException;
 
     // Retrieves a game by its ID
-    GameData getGame(int gameId) throws DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException;
 
     // Retrieves all games from the data source
     Collection<GameData> getAllGame() throws DataAccessException;

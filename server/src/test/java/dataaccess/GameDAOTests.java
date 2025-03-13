@@ -46,8 +46,8 @@ public class GameDAOTests {
         GameData gameData = new GameData(1, "first", "second", "theGame", new ChessGame());
 
         try {
-            var gotGame = game_DAO.getGame(1);
-            Assertions.assertEquals(gameData, gotGame);
+            var getTheGame = game_DAO.getGame(1);
+            Assertions.assertEquals(gameData, getTheGame);
         } catch (DataAccessException e) {
             Assertions.fail();
         }
