@@ -75,5 +75,51 @@ public class UserDAOTests {
         }
     }
 
+    @Test
+    void positiveCreateUser() {
+        Assertions.assertDoesNotThrow(() -> userDAO.createUser(new UserData(
+                "name",
+                "password",
+                "email@email.com")));
+    }
+
+    @Test
+    void negativeCreateUser() {
+        Assertions.assertThrows(DataAccessException.class, () -> userDAO.createUser(new UserData(
+                null,
+                null,
+                null
+        )));
+    }
+
+    @Test
+    void positiveGetUser() {
+        try {
+            userDAO.createUser(new UserData(
+                    "name",
+                    "password",
+                    "email@email.com"
+            ));
+        } catch (DataAccessException ignored) {
+        }
+        try {
+            Assertions.assertEquals(new UserData(
+                    "name",
+                    "password",
+                    "email@email.com"
+            ), userDAO.getUser("name"));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void negativeGetUser() {
+        try {
+            Assertions.assertNull(userDAO.getUser("wrongName"));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
 
 }
