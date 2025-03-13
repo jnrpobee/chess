@@ -100,4 +100,28 @@ public class GameDAOTests {
         }
     }
 
+    @Test
+    void updateGame() {
+        GameData gameData = new GameData(
+                1,
+                "first",
+                "second",
+                "theGame",
+                new ChessGame()
+        );
+        Assertions.assertDoesNotThrow(() -> game_DAO.updateGame(gameData));
+    }
+
+    @Test
+    void positiveClear() {
+        try {
+            game_DAO.clear();
+
+            Assertions.assertNull(game_DAO.getGame(1));
+            Assertions.assertNull(game_DAO.getGame(2));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
 }
