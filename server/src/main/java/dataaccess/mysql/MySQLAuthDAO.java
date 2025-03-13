@@ -19,7 +19,6 @@ public class MySQLAuthDAO implements AuthDAO {
 
     /**
      * Constructor that initializes the database connection.
-     *
      * @throws DataAccessException if there is an error configuring the database or getting the connection.
      */
     public MySQLAuthDAO() throws DataAccessException {
@@ -31,7 +30,7 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
-    /// Clears the AUTH table.
+    /// Clears the AUTH table. 
     /// throws DataAccessException if there is an error clearing the table.
     @Override
     public void clear() throws DataAccessException {
@@ -44,8 +43,7 @@ public class MySQLAuthDAO implements AuthDAO {
 
     /**
      * Creates a new authentication token for the given user.
-     *
-     * @param userData the user data.
+     * @param userData the user data. // this means that the user data is passed to the method to create a new authentication token for the given user
      * @return the created AuthData.
      * @throws DataAccessException if there is an error creating the authentication token.
      */
@@ -67,7 +65,7 @@ public class MySQLAuthDAO implements AuthDAO {
     /**
      * Retrieves the authentication data for the given token.
      *
-     * @param authToken the authentication token.
+     * @param authToken the authentication token. // this means that the authentication token is passed to the method to retrieve the authentication data for the given token
      * @return the retrieved AuthData.
      * @throws DataAccessException if there is an error retrieving the authentication data.
      */
@@ -92,8 +90,7 @@ public class MySQLAuthDAO implements AuthDAO {
 
     /**
      * Deletes the authentication token for the given username.
-     *
-     * @param username the username.
+     * @param username the username. // this means that the username is passed to the method to delete the authentication token for the given username 
      * @return true if the token was deleted, false otherwise.
      * @throws DataAccessException if there is an error deleting the authentication token.
      */

@@ -18,7 +18,6 @@ public class MySQLUserDAO implements UserDAO {
 
     /**
      * Constructor that initializes the database connection.
-     *
      * @throws DataAccessException if there is an error configuring the database or getting the connection.
      */
     public MySQLUserDAO() throws DataAccessException {
@@ -32,7 +31,6 @@ public class MySQLUserDAO implements UserDAO {
 
     /**
      * Clears the USERS table.
-     *
      * @throws DataAccessException if there is an error clearing the table.
      */
     @Override
@@ -47,7 +45,7 @@ public class MySQLUserDAO implements UserDAO {
     /**
      * Checks if the user exists in the USERS table.
      *
-     * @param userData the user data.
+     * @param userData the user data. // this means that the user data is passed to the method to check if the user exists in the USERS table
      * @return true if the user exists, false otherwise.
      * @throws DataAccessException if there is an error checking the user.
      */
@@ -65,8 +63,7 @@ public class MySQLUserDAO implements UserDAO {
 
     /**
      * Creates a new user in the USERS table.
-     *
-     * @param userData the user data.
+     * @param userData the user data. // this means that the user data is passed to the method to create the user in the USERS table
      * @throws DataAccessException if there is an error creating the user.
      */
     @Override
@@ -85,9 +82,8 @@ public class MySQLUserDAO implements UserDAO {
 
     /**
      * Retrieves the user data for the given username.
-     *
-     * @param username the username.
-     * @return the retrieved UserData.
+     * @param username the username. // this means that the username is the primary key in the USERS table
+     * @return the retrieved UserData. // this means that the UserData object is returned if the user exists
      * @throws DataAccessException if there is an error retrieving the user data.
      */
     @Override

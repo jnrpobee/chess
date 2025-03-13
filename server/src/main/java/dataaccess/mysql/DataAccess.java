@@ -37,11 +37,8 @@ public class DataAccess {
         """
     };
 
-    /**
-     * Configures the database by creating necessary tables.
-     *
-     * @throws DataAccessException if there is an error configuring the database.
-     */
+    //Configures the database by creating necessary tables.
+    //@throws DataAccessException if there is an error configuring the database.
     public static void configureDatabase() throws DataAccessException {
         try {
             DatabaseManager.createDatabase();
