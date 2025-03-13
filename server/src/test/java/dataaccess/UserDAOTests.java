@@ -4,6 +4,7 @@ import dataaccess.mysql.MySQLUserDAO;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserDAOTests {
     private static final UserDAO userDAO;
@@ -94,10 +95,12 @@ public class UserDAOTests {
 
     @Test
     void positiveGetUser() {
+        UserData userData = new UserData("name", "password", "email@email.com");
+        String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         try {
             userDAO.createUser(new UserData(
                     "name",
-                    "password",
+                    hashedPassword,
                     "email@email.com"
             ));
         } catch (DataAccessException ignored) {
@@ -105,7 +108,7 @@ public class UserDAOTests {
         try {
             Assertions.assertEquals(new UserData(
                     "name",
-                    "password",
+                    hashedPassword,
                     "email@email.com"
             ), userDAO.getUser("name"));
         } catch (DataAccessException e) {

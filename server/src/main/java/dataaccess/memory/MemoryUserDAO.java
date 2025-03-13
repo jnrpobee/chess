@@ -31,6 +31,7 @@ public class MemoryUserDAO implements UserDAO {
     //creates a new user in the in-memory storage
     @Override
     public void createUser(UserData userData) {
+        //allUsers.put(userData.username(), new UserData(userData.username(), userData.password(), userData.email()));
         allUsers.put(userData.username(), userData);
     }
 }

@@ -28,9 +28,6 @@ public class LoginService {
             throw new DataAccessException("Error: unauthorized");
         }
 
-        // Delete existing authentication data for the user
-        //this.authDAO.deleteAuth(userData.username());
-
         // Check if the provided password matches the stored password
         if (Objects.equals(userData.password(), loginRequest.password())) {
             // Create new authentication data and return it
