@@ -107,4 +107,27 @@ public class AuthDAOTests {
                 "random"));
     }
 
+    @Test
+    void positiveAuthExists() {
+        UserData userData = new UserData(
+                "name",
+                "password",
+                "email@email.com");
+        try {
+            var authData = authDAO.createAuth(userData);
+            Assertions.assertTrue(authDAO.authExists(authData.authToken()));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void negativeAuthExist() {
+        try {
+            Assertions.assertFalse(authDAO.authExists(
+                    "randomToken"));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
 }

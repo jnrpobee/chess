@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class UserDAOTests {
     private static final UserDAO userDAO;
 
@@ -28,7 +31,7 @@ public class UserDAOTests {
                     "email@email.com"
             )));
         } catch (DataAccessException e) {
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -54,7 +57,7 @@ public class UserDAOTests {
                     "email@email.com"
             )));
         } catch (DataAccessException e) {
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -72,7 +75,7 @@ public class UserDAOTests {
                     "badEmail@email.com"
             )));
         } catch (DataAccessException e) {
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -106,22 +109,23 @@ public class UserDAOTests {
         } catch (DataAccessException ignored) {
         }
         try {
-            Assertions.assertEquals(new UserData(
+            assertEquals(new UserData(
                     "name",
                     hashedPassword,
                     "email@email.com"
             ), userDAO.getUser("name"));
         } catch (DataAccessException e) {
-            Assertions.fail();
+            fail();
         }
     }
+    
 
     @Test
     void negativeGetUser() {
         try {
             Assertions.assertNull(userDAO.getUser("wrongName"));
         } catch (DataAccessException e) {
-            Assertions.fail();
+            fail();
         }
     }
 
