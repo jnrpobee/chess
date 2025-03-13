@@ -50,11 +50,61 @@ public class AuthDAOTests {
 
     @Test
     void negativeCreateAuth() {
-        UserData userData = new UserData(
-                "name",
+        UserData invalidUserData = new UserData(
+                null,
                 "password",
                 "email@email.com"
         );
-        Assertions.assertDoesNotThrow(() -> authDAO.createAuth(userData));
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.createAuth(invalidUserData));
     }
+
+    @Test
+    void positiveGetAuth() {
+        UserData userData = new UserData(
+                "name",
+                "password",
+                "email@email.com");
+        try {
+            var authData = authDAO.createAuth(userData);
+
+            Assertions.assertEquals(authData, authDAO.getAuth(authData.authToken()));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void negativeGetAuth() {
+        UserData userData = new UserData(
+                "name",
+                "password",
+                "email@email.com");
+        try {
+            authDAO.createAuth(userData);
+            Assertions.assertThrows(DataAccessException.class, () -> authDAO.getAuth("random"));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void positiveDeleteAuth() {
+        UserData userData = new UserData(
+                "name",
+                "password",
+                "email@email.com");
+        try {
+            var authData = authDAO.createAuth(userData);
+            Assertions.assertTrue(authDAO.deleteAuth(authData.authToken()));
+        } catch (DataAccessException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    void negativeDeleteAuth() {
+        Assertions.assertDoesNotThrow(() -> authDAO.deleteAuth(
+                "random"));
+    }
+
 }
