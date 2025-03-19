@@ -2,6 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import model.AuthData;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
@@ -9,10 +11,34 @@ import java.net.*;
 public class ServerFacade {
     private final String serverUrl;
     private String authToken;
-    
+
 
     public ServerFacade(String url) {
         serverUrl = url;
+    }
+
+    public AuthData registerUser(UserData userData) throws DataAccessException {
+        var path = "/user";
+        AuthData authData = this.makeRequest("POST", path, userData, AuthData.class);
+        if (authData != null) {
+            authToken = authData.authToken();
+        }
+        return authData;
+    }
+
+    public AuthData loginUser(UserData userData) throws DataAccessException {
+        var path = "/session";
+        AuthData authData = this.makeRequest("POST", path, userData, AuthData.class);
+        if (authData != null) {
+            authToken = authData.authToken();
+        }
+        return authData;
+    }
+
+    public logoutUser() throws DataAccessException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, null);
+        authToken = null;
     }
 
 
