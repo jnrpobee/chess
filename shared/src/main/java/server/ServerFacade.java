@@ -2,11 +2,19 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.handler.CreateRequest;
+import dataaccess.handler.JoinRequest;
+import dataaccess.handler.ListRequest;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import result.GameDataResult;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
+import java.util.Collection;
+import java.util.List;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -35,12 +43,35 @@ public class ServerFacade {
         return authData;
     }
 
-    public logoutUser() throws DataAccessException {
+    public void logoutUser() throws DataAccessException {
         var path = "/session";
+        if (authToken != null) {
+            http.addRequestProperty("Authorization", authToken);
+        }
         this.makeRequest("DELETE", path, null, null);
         authToken = null;
     }
 
+    public Collection<GameDataResult> listGames() throws DataAccessException {
+        var path = "/game";
+        return this.makeRequest("GET", path, null, ListRequest.class).games();
+
+    }
+
+    public GameData createGame(CreateRequest gameName) throws DataAccessException {
+        var path = "/game";
+        return this.makeRequest("POST", path, gameName, GameData.class);
+    }
+
+    public void joinGame(JoinRequest joinRequest) throws DataAccessException {
+        var path = "/game";
+        this.makeRequest("PUT", path, joinRequest, null);
+    }
+
+    public void clear() throws DataAccessException {
+        var path = "db";
+        this.makeRequest("DELETE", path, null, null);
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
         try {
@@ -48,6 +79,10 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
@@ -59,7 +94,6 @@ public class ServerFacade {
             throw new DataAccessException(ex.getMessage());
         }
     }
-
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
