@@ -2,16 +2,23 @@ package ui;
 
 import java.util.Scanner;
 
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+
 public class Repl {
-    private final PetClient client;
+    private final PreLogin preLogin;
+    private final PostLogin postLogin;
+    private final GamePlay gamePlay;
+
 
     public Repl(String serverUrl) {
 
-        client = new PetClient(serverUrl, this);
+        preLogin = new PreLogin(serverUrl, this);
+        postLogin = new PostLogin(serverUrl, this);
+        gamePlay = new GamePlay(serverUrl, this);
     }
 
     public void run() {
-        System.out.println("\uD83D\uDC36 Welcome to the pet store. Sign in to start.");
+        System.out.println("♕ Welcome to 240 Chess Game. Type Help to get started ♕");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -22,7 +29,7 @@ public class Repl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
