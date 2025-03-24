@@ -1,8 +1,9 @@
 package ui;
 
+import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 import server.ServerFacade;
-import service.DataAccessException;
 
 import java.util.Arrays;
 
@@ -29,7 +30,7 @@ public class PreLogin {
                 case "register" -> register(params);
                 default -> help();
             };
-        } catch (DataAccessException ex) {
+        } catch (ResponseException ex) {
             return ex.getMessage();
         }
     }
@@ -44,13 +45,13 @@ public class PreLogin {
     }
 
 
-    public String register(String... params) throws DataAccessException {
+    public String register(String... params) throws ResponseException {
         if (params.length == 3) {
             String username = params[0];
             String password = params[1];
             String email = params[2];
             UserData user = new UserData(username, password, email);
-            LoginResult res = serverFacade.register(user);
+            AuthData res = serverFacade.register(user);
             this.auth = res.authToken();
             state = 1;
             return String.format("Registered user %s", username);

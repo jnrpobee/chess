@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import exception.ResponseException;
 import result.GameDataResult;
 import dataaccess.handler.*;
 import model.*;
@@ -19,7 +19,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public AuthData registerUser(UserData userData) throws DataAccessException {
+    public AuthData registerUser(UserData userData) throws ResponseException {
         var path = "/user";
         AuthData authData = this.makeRequest("POST", path, userData, AuthData.class, null);
         if (authData != null) {
@@ -28,7 +28,7 @@ public class ServerFacade {
         return authData;
     }
 
-    public AuthData loginUser(UserData userData) throws DataAccessException {
+    public AuthData loginUser(UserData userData) throws ResponseException {
         var path = "/session";
         AuthData authData = this.makeRequest("POST", path, userData, AuthData.class, null);
         if (authData != null) {
@@ -37,35 +37,35 @@ public class ServerFacade {
         return authData;
     }
 
-    public void logoutUser() throws DataAccessException {
+    public void logoutUser() throws ResponseException {
         var path = "/session";
 
         this.makeRequest("DELETE", path, null, null, authToken);
         authToken = null;
     }
 
-    public Collection<GameDataResult> listGames() throws DataAccessException {
+    public Collection<GameDataResult> listGames() throws ResponseException {
         var path = "/game";
         return this.makeRequest("GET", path, null, ListRequest.class, authToken).games();
 
     }
 
-    public GameData createGame(CreateRequest gameName) throws DataAccessException {
+    public GameData createGame(CreateRequest gameName) throws ResponseException {
         var path = "/game";
         return this.makeRequest("POST", path, gameName, GameData.class, authToken);
     }
 
-    public void joinGame(JoinRequest joinRequest) throws DataAccessException {
+    public void joinGame(JoinRequest joinRequest) throws ResponseException {
         var path = "/game";
         this.makeRequest("PUT", path, joinRequest, null, authToken);
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws ResponseException {
         var path = "db";
         this.makeRequest("DELETE", path, null, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String AuthToken) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String AuthToken) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -80,10 +80,10 @@ public class ServerFacade {
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (DataAccessException ex) {
+        } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
@@ -97,16 +97,16 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
 //            try (InputStream respErr = http.getErrorStream()) {
 //                if (respErr != null) {
-//                    throw DataAccessException.fromJson(respErr);
+//                    throw ResponseException.fromJson(respErr);
 //                }
 //            }
 
-            throw new DataAccessException("other failure: " + status);
+            throw new ResponseException(status, "other failure: " + status);
         }
     }
 
