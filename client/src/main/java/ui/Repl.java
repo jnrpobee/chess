@@ -2,7 +2,7 @@ package ui;
 
 import java.util.Scanner;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 public class Repl {
     private final PreLogin preLogin;
@@ -18,8 +18,9 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("♕ Welcome to 240 Chess Game. Type Help to get started ♕");
-        System.out.print(client.help());
+        System.out.println(SET_TEXT_BOLD + SET_BG_COLOR_DARK_GREEN +
+                "♕ Welcome to 240 Chess Game. Type Help to get started ♕");
+        System.out.print(preLogin.help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -28,11 +29,10 @@ public class Repl {
             String line = scanner.nextLine();
 
             try {
-                result = client.eval(line);
+                result = preLogin.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
+                System.out.print(e.getMessage());
             }
         }
         System.out.println();
