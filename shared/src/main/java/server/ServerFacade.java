@@ -3,7 +3,6 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import result.GameDataResult;
-import dataaccess.handler.*;
 import model.*;
 
 import java.io.*;
@@ -46,16 +45,16 @@ public class ServerFacade {
 
     public Collection<GameDataResult> listGames() throws ResponseException {
         var path = "/game";
-        return this.makeRequest("GET", path, null, ListRequest.class, authToken).games();
+        return this.makeRequest("GET", path, null, ListGameRequest.class, authToken).games();
 
     }
 
-    public GameData createGame(CreateRequest gameName) throws ResponseException {
+    public GameData createGame(GameName gameName) throws ResponseException {
         var path = "/game";
         return this.makeRequest("POST", path, gameName, GameData.class, authToken);
     }
 
-    public void joinGame(JoinRequest joinRequest) throws ResponseException {
+    public void joinGame(JoinGameRequest joinRequest) throws ResponseException {
         var path = "/game";
         this.makeRequest("PUT", path, joinRequest, null, authToken);
     }
@@ -83,7 +82,7 @@ public class ServerFacade {
         } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ResponseException(ex.getMessage());
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 
