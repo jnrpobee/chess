@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import result.GameDataResult;
+import result.*;
 import model.*;
 
 import java.io.*;
@@ -27,9 +27,9 @@ public class ServerFacade {
         return authData;
     }
 
-    public AuthData loginUser(UserData userData) throws ResponseException {
+    public AuthData loginUser(LoginRequest loginRequest) throws ResponseException {
         var path = "/session";
-        AuthData authData = this.makeRequest("POST", path, userData, AuthData.class, null);
+        AuthData authData = this.makeRequest("POST", path, loginRequest, AuthData.class, null);
         if (authData != null) {
             authToken = authData.authToken();
         }

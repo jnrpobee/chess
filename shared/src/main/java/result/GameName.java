@@ -1,4 +1,4 @@
-package model;
+package result;
 
 public record GameName(String gameName) {
 }
