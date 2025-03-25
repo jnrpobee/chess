@@ -12,7 +12,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
 
-        preLogin = new PreLogin(serverUrl, this);
+        preLogin = new PreLogin(serverUrl);
         postLogin = new PostLogin(serverUrl, this);
         gamePlay = new GamePlay(serverUrl, this);
     }
@@ -49,7 +49,7 @@ public class Repl {
                         System.out.println("\nEntering gameplay phase...");
                         System.out.print(gamePlay.help());
                     }
-                } else if (state.equals("gamePlay")) {
+                } else {
                     result = gamePlay.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Optionally return to postLogin or quit

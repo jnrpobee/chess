@@ -77,4 +77,12 @@ public class PreLogin {
         throw new ResponseException(400, "Expected: <username> <password> <email>");
     }
 
+//    public void setState(int state) {
+//        this.state = state;
+//    }
+//
+//    public int getState() {
+//        return state;
+//    }
+
 }
