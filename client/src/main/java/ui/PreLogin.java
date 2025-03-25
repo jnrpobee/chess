@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class PreLogin {
     private final String serverURL;
-    private int state = 0;
+    int state = 0;
 
     private String auth = null;
     private final ServerFacade serverFacade;
@@ -77,12 +77,5 @@ public class PreLogin {
         throw new ResponseException(400, "Expected: <username> <password> <email>");
     }
 
-//    public void setState(int state) {
-//        this.state = state;
-//    }
-//
-//    public int getState() {
-//        return state;
-//    }
 
 }
