@@ -13,12 +13,12 @@ public class Repl {
     public Repl(String serverUrl) {
 
         preLogin = new PreLogin(serverUrl);
-        postLogin = new PostLogin(serverUrl, this);
-        gamePlay = new GamePlay(serverUrl, this);
+        postLogin = new PostLogin(serverUrl, preLogin.getAuth());
+        gamePlay = new GamePlay(serverUrl, this.toString());
     }
 
     public void run() {
-        System.out.println(SET_TEXT_BOLD + SET_BG_COLOR_DARK_GREEN +
+        System.out.println(SET_TEXT_BOLD +
                 "♕ Welcome to 240 Chess Game. Type Help to get started ♕");
         System.out.print(preLogin.help());
 
@@ -27,6 +27,11 @@ public class Repl {
         String result = "";
 
         while (!result.equals("quit")) {
+            if (preLogin.state == 1) {
+                state = "postLogin";
+            }
+
+            postLogin.authData = preLogin.getAuth();
             printPrompt();
             String line = scanner.nextLine();
 

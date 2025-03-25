@@ -28,21 +28,21 @@ public class GamePlay {
     }
 
     public String eval(String input) {
-        try {
-            var tokens = input.toLowerCase().split(" ");
-            var cmd = (tokens.length > 0) ? tokens[0] : "help";
-            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "quit" -> "quit";
-                case "help" -> help();
-                case "draw" -> theGameBoard(chessGame);
-                case "move" -> makeMove(params);
-                case "leave" -> leaveGame();
-                default -> "";
-            };
-        } catch (ResponseException e) {
-            return e.getMessage();
-        }
+        //try {
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        return switch (cmd) {
+            case "quit" -> "quit";
+            case "help" -> help();
+            case "draw" -> theGameBoard(chessGame);
+            //case "move" -> makeMove(params);
+            //case "leave" -> leaveGame();
+            default -> "";
+        };
+//        } catch (ResponseException e) {
+//            return e.getMessage();
+//        }
     }
 
     public String help() {
@@ -151,21 +151,21 @@ public class GamePlay {
         return result.toString();
     }
 
-    public String makeMove(String... params) throws ResponseException {
-        if (params.length == 2) {
-            String startPos = params[0].toLowerCase();
-            String endPos = params[1].toLowerCase();
-            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
-                return "provide a valid position letter a-h number 1-8:";
-            }
-            ChessPosition start = convertPosition(startPos);
-            ChessPosition end = convertPosition(endPos);
-            ChessMove move = new ChessMove(start, end, null);
-            serverFacade.makeMove(new AuthData(authData.authToken()), gameID, move);
-            return "";
-        } else {
-            return "Move <start-position> <end-position>";
-        }
-    }
+//    public String makeMove(String... params) throws ResponseException {
+//        if (params.length == 2) {
+//            String startPos = params[0].toLowerCase();
+//            String endPos = params[1].toLowerCase();
+//            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
+//                return "provide a valid position letter a-h number 1-8:";
+//            }
+//            ChessPosition start = convertPosition(startPos);
+//            ChessPosition end = convertPosition(endPos);
+//            ChessMove move = new ChessMove(start, end, null);
+//            serverFacade.makeMove(new AuthData(authData.authToken()), gameID, move);
+//            return "";
+//        } else {
+//            return "Move <start-position> <end-position>";
+//        }
+//    }
 
 }

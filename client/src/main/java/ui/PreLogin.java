@@ -8,12 +8,13 @@ import server.ServerFacade;
 
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class PreLogin {
     private final String serverURL;
     int state = 0;
 
-    private String auth = null;
+    public String auth = null;
     private final ServerFacade serverFacade;
 
     public PreLogin(String serverURL) {
@@ -29,7 +30,7 @@ public class PreLogin {
             return switch (cmd) {
                 case "login" -> signIn(params);
                 case "quit" -> "quit";
-                case "register" -> register(params);
+                case "register" -> register();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -59,11 +60,17 @@ public class PreLogin {
         throw new ResponseException(400, "Expected: <username> <password>");
     }
 
-//    public String getAuth() {
-//        return auth;
-//    }
+    public String getAuth() {
+        return auth;
+    }
 
-    public String register(String... params) throws ResponseException {
+    public String register() throws ResponseException {
+        System.out.println("Enter <username> <password> <email>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
+
         if (params.length == 3) {
             String username = params[0];
             String password = params[1];

@@ -43,7 +43,7 @@ public class ServerFacade {
         authToken = null;
     }
 
-    public Collection<GameDataResult> listGames() throws ResponseException {
+    public Collection<GameDataResult> listGames(String authToken) throws ResponseException {
         var path = "/game";
         return this.makeRequest("GET", path, null, ListGameRequest.class, authToken).games();
 
@@ -71,8 +71,8 @@ public class ServerFacade {
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
-            if (authToken != null) {
-                http.setRequestProperty("Authorization", authToken);
+            if (AuthToken != null) {
+                http.setRequestProperty("Authorization", AuthToken);
             }
 
             writeBody(request, http);

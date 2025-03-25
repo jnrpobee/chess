@@ -21,7 +21,7 @@ public class PostLogin {
 
 
     private int state = 1;
-    private final String authData;
+    String authData;
     private int gameData;
 
     private final ServerFacade serverFacade;
@@ -75,10 +75,11 @@ public class PostLogin {
 
     public String createGame(String... params) throws ResponseException {
         if (params.length == 1) {
-            GameData info = new GameData(gameData);
+            //GameData info = new GameData(gameData, authData, authData, authData, null); // added authData as a parameter to GameData constructor to fix compilation error 
             String gameName = params[0];
             GameName req = new GameName(gameName);
-            CreateGameResult res = serverFacade.createGame(req, info);
+            //CreateGameResult res = serverFacade.createGame(req, info);
+            GameData res = serverFacade.createGame(req);
             int gameID = res.gameID();
             return String.format("Created Game: %s (id: %s)", gameName, gameID);
         }
@@ -88,21 +89,22 @@ public class PostLogin {
 
     public String updateGame(String... params) throws ResponseException {
         if (params.length == 2 || params.length == 1) {
-            AuthData info = new AuthData(authData.authToken());
+            //AuthData info = new AuthData(authData, authData); // added authData as a parameter to AuthData constructor to fix compilation error     
             String playerColor = null;
             int gameID = 0;
             if (params.length == 2) {
                 playerColor = params[0];
                 gameID = Integer.parseInt(params[1]);
 
-                ChessGame.TeamColor teamColor = null;
+                //ChessGame.TeamColor teamColor = null;
                 if (Objects.equals("Black", playerColor)) {
-                    teamColor = ChessGame.TeamColor.BLACK;
+                    //    teamColor = ChessGame.TeamColor.BLACK;
                 } else if (Objects.equals("White", playerColor)) {
-                    teamColor = ChessGame.TeamColor.WHITE;
+                    //    teamColor = ChessGame.TeamColor.WHITE;
                 }
                 JoinGameRequest joinTheGame = new JoinGameRequest(gameID, playerColor);
-                serverFacade.joinGame(info, joinTheGame);
+                //serverFacade.joinGame(info, joinTheGame);
+                serverFacade.joinGame(joinTheGame);
             } else {
                 gameID = Integer.parseInt(params[0]);
             }
@@ -120,9 +122,7 @@ public class PostLogin {
     public String listGames(String... params) throws ResponseException {
         if (params.length == 0) {
             StringBuilder result = new StringBuilder("GAMES LIST:\n");
-            AuthData info = new AuthData(authData);
-            ListGameRequest gameList = serverFacade.listGames(info);
-            Collection<GameDataResult> gamesList = gameList.games();
+            Collection<GameDataResult> gamesList = serverFacade.listGames(authData);
             for (GameDataResult game : gamesList) {
                 result.append("Game ID: ").append(game.gameID()).append("\n");
                 result.append("Game Name: ").append(game.gameName()).append("\n");
@@ -134,4 +134,24 @@ public class PostLogin {
         }
         throw new ResponseException(400, "Expected: list");
     }
+
+//    public String listGames(String... params) throws ResponseException {
+//        if (params.length == 0) {
+//            StringBuilder result = new StringBuilder("GAMES LIST:\n");
+//            //AuthData info = new AuthData(authData, authData); // added authData as a parameter to AuthData constructor to fix compilation error
+//            ListGameRequest gameList = serverFacade.listGames(info);
+//            Collection<GameDataResult> gamesList = gameList.games();
+//            for (GameDataResult game : gamesList) {
+//                result.append("Game ID: ").append(game.gameID()).append("\n");
+//                result.append("Game Name: ").append(game.gameName()).append("\n");
+//                result.append("White: ").append(game.whiteUsername()).append("\n");
+//                result.append("Black: ").append(game.blackUsername()).append("\n");
+//                result.append("\n");
+//            }
+//            return result.toString();
+//        }
+//        throw new ResponseException(400, "Expected: list");
+//    }
+
+
 }
