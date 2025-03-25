@@ -21,7 +21,9 @@ public class PostLogin {
 
 
     private int state = 1;
-    private String authData;
+    private final String authData;
+    private int gameData;
+
     private final ServerFacade serverFacade;
 
     int gameID = 0;
@@ -86,7 +88,7 @@ public class PostLogin {
 
     public String updateGame(String... params) throws ResponseException {
         if (params.length == 2 || params.length == 1) {
-            AuthData info = new AuthData(authData);
+            AuthData info = new AuthData(authData.authToken());
             String playerColor = null;
             int gameID = 0;
             if (params.length == 2) {
