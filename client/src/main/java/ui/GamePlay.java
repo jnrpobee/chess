@@ -4,18 +4,22 @@ import chess.*;
 import exception.ResponseException;
 import server.ServerFacade;
 
-import java.util.Arrays;
-
 import static ui.EscapeSequences.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class GamePlay {
     private final String serverURL;
 
-    private ChessGame chessGame;
+    private ChessGame chessGame = new ChessGame();
 
-    private int gameID;
+    public int gameID;
     public int state = 2;
-    private String authData;
+    public String authData;
     private final ServerFacade serverFacade;
 
 
@@ -31,30 +35,127 @@ public class GamePlay {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "quit" -> "quit";
+            case "quit" -> "exit";
             case "help" -> help();
-            case "draw" -> theGameBoard(chessGame);
+            case "draw" -> drawBoard(chessGame);
+            case "highlight" -> highlightMoves(chessGame, params);
             default -> "";
         };
-//        } catch (ResponseException e) {
-//            return e.getMessage();
-//        }
+
     }
 
     public String help() {
         return """
                 - Help
-                - Quit
+                - exit
                 - Draw
                 - Move
                 - Highlight
-                - Leave
-                - Resign
                 """;
     }
 
+    public String highlightMoves(ChessGame game, String... params) {
+        if (params.length != 1 || !isValidPosition(params[0])) {
+            return "Usage: highlight <position>";
+        }
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK);
+        String[][] board = new String[8][8];
+        ChessBoard board2 = game.getBoard();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = board2.getPiece(new ChessPosition(i + 1, j + 1));
+                if (piece != null) {
+                    switch (piece.getPieceType()) {
+                        case ChessPiece.PieceType.PAWN: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_PAWN;
+                            } else {
+                                board[i][j] = BLACK_PAWN;
+                            }
+                            break;
+                        }
+                        case ChessPiece.PieceType.KING: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_KING;
+                            } else {
+                                board[i][j] = BLACK_KING;
+                            }
+                            break;
+                        }
+                        case ChessPiece.PieceType.BISHOP: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_BISHOP;
+                            } else {
+                                board[i][j] = BLACK_BISHOP;
+                            }
+                            break;
+                        }
+                        case ChessPiece.PieceType.KNIGHT: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_KNIGHT;
+                            } else {
+                                board[i][j] = BLACK_KNIGHT;
+                            }
+                            break;
+                        }
+                        case ChessPiece.PieceType.ROOK: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_ROOK;
+                            } else {
+                                board[i][j] = BLACK_ROOK;
+                            }
+                            break;
+                        }
+                        case ChessPiece.PieceType.QUEEN: {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                board[i][j] = WHITE_QUEEN;
+                            } else {
+                                board[i][j] = BLACK_QUEEN;
+                            }
+                            break;
+                        }
+                        default: {
+                            board[i][j] = EMPTY;
+                            break;
+                        }
+                    }
+                } else {
+                    board[i][j] = EMPTY;
+                }
+            }
+        }
+        ChessPosition piecePosition = convertPosition(params[0]);
+        Collection<ChessMove> moves = game.validMoves(piecePosition);
+        for (ChessMove move : moves) {
+            int row = move.getEndPosition().getRow();
+            int col = move.getEndPosition().getColumn();
+            board[row - 1][col - 1] = "x";
+        }
+        StringBuilder result = new StringBuilder();
+        result.append("  h\u2003g\u2003f\u2003e\u2003d\u2003c\u2003b\u2003a\n");
+        result.append(" +--------------------+\n");
+        for (int i = 7; i >= 0; i--) {
+            result.append(i + 1).append("|");
+            for (int j = 7; j >= 0; j--) {
+                result.append(board[i][j]).append("|");
+            }
+            result.append("\n");
+        }
+        result.append(" +--------------------+\n");
+        result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
+        result.append(" +--------------------+\n");
+        for (int i = 0; i < 8; i++) { // Start with row 7 and go down to row 0
+            result.append(i + 1).append("|");
+            for (int j = 0; j < 8; j++) {
+                result.append(board[i][j]).append("|");
+            }
+            result.append("\n");
+        }
+        result.append(" +--------------------+\n");
+        return result.toString();
+    }
 
-    public String theGameBoard(ChessGame game) {
+    public String drawBoard(ChessGame game) {
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK);
         String[][] board = new String[8][8];
         ChessBoard board2 = game.getBoard();
@@ -124,7 +225,7 @@ public class GamePlay {
         }
         StringBuilder result = new StringBuilder();
         result.append("  h\u2003g\u2003f\u2003e\u2003d\u2003c\u2003b\u2003a\n");
-        result.append(" +---------+\n");
+        result.append(" +--------------------+\n");
         for (int i = 7; i >= 0; i--) {
             result.append(i + 1).append("|");
             for (int j = 7; j >= 0; j--) {
@@ -132,37 +233,22 @@ public class GamePlay {
             }
             result.append("\n");
         }
-        result.append(" +-----------+\n");
+        result.append(" +--------------------+\n");
 
         result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
-        result.append(" +------------+\n");
-        for (int i = 0; i < 8; i++) {
+        result.append(" +--------------------+\n");
+        for (int i = 0; i < 8; i++) { // Start with row 7 and go down to row 0
             result.append(i + 1).append("|");
             for (int j = 0; j < 8; j++) {
                 result.append(board[i][j]).append("|");
             }
             result.append("\n");
         }
-        result.append(" +--------+\n");
+        result.append(" +--------------------+\n");
 
         return result.toString();
     }
 
-//    public String makeMove(String... params) throws ResponseException {
-//        if (params.length == 2) {
-//            String startPos = params[0].toLowerCase();
-//            String endPos = params[1].toLowerCase();
-//            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
-//                return "provide a valid position letter a-h number 1-8:";
-//            }
-//            ChessPosition start = convertPosition(startPos);
-//            ChessPosition end = convertPosition(endPos);
-//            ChessMove move = new ChessMove(start, end, null);
-//            return "";
-//        } else {
-//            return "Move <start-position> <end-position>";
-//        }
-//    }
 
     private ChessPosition convertPosition(String positionString) {
         int row = 0;
@@ -205,21 +291,22 @@ public class GamePlay {
         return new ChessPosition(row, col);
     }
 
+    private boolean isValidPosition(String positionString) {
+        if (positionString.length() != 2) {
+            return false;
+        }
+        Set<Character> charSet = new HashSet<>();
 
-//    private boolean isValidPosition(String positionString) {
-//        if (positionString.length() != 2) {
-//            return false;
-//        }
-//        Set<Character> charSet = new HashSet<>();
-//        // Add characters 'a' to 'h'
-//        for (char c = 'a'; c <= 'h'; c++) {
-//            charSet.add(c);
-//        }
-//        // Add characters '1' to '8'
-//        for (char c = '1'; c <= '8'; c++) {
-//            charSet.add(c);
-//        }
-//        return charSet.contains(positionString.charAt(0)) && charSet.contains(positionString.charAt(1));
-//    }
+        // Add characters 'a' to 'h'
+        for (char c = 'a'; c <= 'h'; c++) {
+            charSet.add(c);
+        }
+
+        // Add characters '1' to '8'
+        for (char c = '1'; c <= '8'; c++) {
+            charSet.add(c);
+        }
+        return charSet.contains(positionString.charAt(0)) && charSet.contains(positionString.charAt(1));
+    }
 
 }

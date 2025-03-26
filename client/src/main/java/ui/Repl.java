@@ -40,9 +40,12 @@ public class Repl {
 
             if (state.equals("gamePlay") && result.equals("exit")) {
                 postLogin.state = 1; // Return to postLogin state
-            } else if (state.equals("postLogin") && result.equals("logout")) {
-                preLogin.state = 0; // Return to preLogin state
+                state = "postLogin";
+            } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
+                postLogin.state = 0; // Return to preLogin state
+                preLogin.state = 0;
                 System.out.print(result + preLogin.help());
+                state = "preLogin";
             }
 
             postLogin.authData = preLogin.getAuth();

@@ -17,7 +17,6 @@ public class PostLogin {
 
     private final String serverURL;
 
-
     public int state = 1;
     String authData;
     private int gameData;
@@ -41,7 +40,7 @@ public class PostLogin {
                 case "logout" -> logout(params);
                 case "list" -> listGames(params);
                 case "create" -> createGame();
-                case "join" -> updateGame(params);
+                case "join" -> updateGame();
                 case "observe" -> observe();
                 case "quit" -> "quit";
                 default -> help();
@@ -92,9 +91,14 @@ public class PostLogin {
     }
 
 
-    public String updateGame(String... params) throws ResponseException {
+    public String updateGame() throws ResponseException {
+        System.out.println("provide <black or white> <game_id>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
         if (params.length == 2 || params.length == 1) {
-            //AuthData info = new AuthData(authData, authData); // added authData as a parameter to AuthData constructor to fix compilation error     
+            //AuthData info = new AuthData(authData, authData); // added authData as a parameter to AuthData constructor to fix compilation error
             String playerColor = null;
             int gameID = 0;
             if (params.length == 2) {
@@ -168,5 +172,56 @@ public class PostLogin {
         }
         throw new ResponseException(400, "Expected: observe <game_id>");
     }
+//
+//    public String listGames(String... params) throws ResponseException {
+//        if (params.length == 0) {
+//            StringBuilder result = new StringBuilder("GAMES LIST:\n");
+//            Collection<GameDataResult> gamesList = serverFacade.listGames();
+//            gameNumberToID.clear(); // Clear previous mappings
+//            int gameNumber = 1;
+//            for (GameDataResult game : gamesList) {
+//                gameNumberToID.put(gameNumber, game.gameID());
+//                result.append(String.format("%d. Game Name: %s\n", gameNumber, game.gameName()));
+//                result.append("   White: ").append(game.whiteUsername()).append("\n");
+//                result.append("   Black: ").append(game.blackUsername()).append("\n\n");
+//                gameNumber++;
+//            }
+//            return result.toString();
+//        }
+//        throw new ResponseException(400, "Expected: list");
+//    }
+//
+//    public String observe() throws ResponseException {
+//        System.out.println("observe <game_number>");
+//        Scanner scanner = new Scanner(System.in);
+//        String line = scanner.nextLine();
+//        var tokens = line.toLowerCase().split(" ");
+//        if (tokens.length == 1) {
+//            try {
+//                int gameNumber = Integer.parseInt(tokens[0]);
+//                if (!gameNumberToID.containsKey(gameNumber)) {
+//                    throw new ResponseException(404, "Game not found with number: " + gameNumber);
+//                }
+//                int gameID = gameNumberToID.get(gameNumber);
+//                Collection<GameDataResult> gamesList = serverFacade.listGames();
+//                String gameName = null;
+//                for (GameDataResult game : gamesList) {
+//                    if (game.gameID() == gameID) {
+//                        gameName = game.gameName();
+//                        break;
+//                    }
+//                }
+//                if (gameName == null) {
+//                    throw new ResponseException(404, "Game not found with ID: " + gameID);
+//                }
+//                this.state = 2; // Set state to observing
+//                this.gameID = gameID;
+//                return String.format("Observing Game: %s (id: %d)", gameName, gameID);
+//            } catch (NumberFormatException e) {
+//                throw new ResponseException(400, "Invalid game number format. Expected: observe <game_number>");
+//            }
+//        }
+//        throw new ResponseException(400, "Expected: observe <game_number>");
+//    }
 
 }
