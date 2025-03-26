@@ -2,13 +2,10 @@ package ui;
 
 import chess.ChessGame;
 import exception.ResponseException;
-import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
-import result.CreateGameResult;
 import result.GameDataResult;
 import result.GameName;
-import result.ListGameRequest;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -21,7 +18,7 @@ public class PostLogin {
     private final String serverURL;
 
 
-    private int state = 1;
+    public int state = 1;
     String authData;
     private int gameData;
 
@@ -45,6 +42,7 @@ public class PostLogin {
                 case "list" -> listGames(params);
                 case "create" -> createGame();
                 case "join" -> updateGame(params);
+                case "observe" -> observe();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -53,6 +51,7 @@ public class PostLogin {
         }
     }
 
+
     public String help() {
         return """
                 - Help
@@ -60,6 +59,7 @@ public class PostLogin {
                 - Logout
                 - Create
                 - List
+                - Observe
                 - Join
                 """;
     }
@@ -67,7 +67,7 @@ public class PostLogin {
     public String logout(String... params) throws ResponseException {
         if (params.length == 0) {
             serverFacade.logoutUser();
-            state = 0;
+            this.state = 0;
             return "Logged out successfully";
         }
         throw new ResponseException(400, "Expected: logout");
@@ -140,23 +140,33 @@ public class PostLogin {
         throw new ResponseException(400, "Expected: list");
     }
 
-//    public String listGames(String... params) throws ResponseException {
-//        if (params.length == 0) {
-//            StringBuilder result = new StringBuilder("GAMES LIST:\n");
-//            //AuthData info = new AuthData(authData, authData); // added authData as a parameter to AuthData constructor to fix compilation error
-//            ListGameRequest gameList = serverFacade.listGames(info);
-//            Collection<GameDataResult> gamesList = gameList.games();
-//            for (GameDataResult game : gamesList) {
-//                result.append("Game ID: ").append(game.gameID()).append("\n");
-//                result.append("Game Name: ").append(game.gameName()).append("\n");
-//                result.append("White: ").append(game.whiteUsername()).append("\n");
-//                result.append("Black: ").append(game.blackUsername()).append("\n");
-//                result.append("\n");
-//            }
-//            return result.toString();
-//        }
-//        throw new ResponseException(400, "Expected: list");
-//    }
-
+    public String observe() throws ResponseException {
+        System.out.println("observe <game_id>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        if (tokens.length == 1) {
+            try {
+                int gameID = Integer.parseInt(tokens[0]);
+                Collection<GameDataResult> gamesList = serverFacade.listGames();
+                String gameName = null;
+                for (GameDataResult game : gamesList) {
+                    if (game.gameID() == gameID) {
+                        gameName = game.gameName();
+                        break;
+                    }
+                }
+                if (gameName == null) {
+                    throw new ResponseException(404, "Game not found with ID: " + gameID);
+                }
+                this.state = 2; // Set state to observing
+                this.gameID = gameID;
+                return String.format("Observing Game: %s (id: %d)", gameName, gameID);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "Invalid game ID format. Expected: observe <game_id>");
+            }
+        }
+        throw new ResponseException(400, "Expected: observe <game_id>");
+    }
 
 }

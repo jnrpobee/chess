@@ -64,6 +64,16 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
+    public GameData observeGame(GameData gameData) throws ResponseException {
+        var path = "/game/";
+        return this.makeRequest("GET", path + gameData, null, GameData.class);
+    }
+
+    // public GameData move(MoveRequest moveRequest) throws ResponseException {
+    //     var path = "/game";
+    //     return this.makeRequest("PUT", path, moveRequest, GameData.class);
+    // }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();

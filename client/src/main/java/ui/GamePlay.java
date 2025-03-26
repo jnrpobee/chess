@@ -2,9 +2,7 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
-import model.AuthData;
 import server.ServerFacade;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 
@@ -16,7 +14,7 @@ public class GamePlay {
     private ChessGame chessGame;
 
     private int gameID;
-    private int state = 2;
+    public int state = 2;
     private String authData;
     private final ServerFacade serverFacade;
 
@@ -27,7 +25,7 @@ public class GamePlay {
         this.authData = authData;
     }
 
-    public String eval(String input) {
+    public String eval(String input) throws ResponseException {
         //try {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -36,8 +34,6 @@ public class GamePlay {
             case "quit" -> "quit";
             case "help" -> help();
             case "draw" -> theGameBoard(chessGame);
-            //case "move" -> makeMove(params);
-            //case "leave" -> leaveGame();
             default -> "";
         };
 //        } catch (ResponseException e) {
@@ -50,12 +46,13 @@ public class GamePlay {
                 - Help
                 - Quit
                 - Draw
-                - Move - make a move <start-position> <end-position>
-                - Highlight - highlight moves for a piece <piece-position>
-                - Leave - leave the game
-                - Resign - Forfeit the game (you will be given a loss and game will be ended)
+                - Move
+                - Highlight
+                - Leave
+                - Resign
                 """;
     }
+
 
     public String theGameBoard(ChessGame game) {
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK);
@@ -161,11 +158,68 @@ public class GamePlay {
 //            ChessPosition start = convertPosition(startPos);
 //            ChessPosition end = convertPosition(endPos);
 //            ChessMove move = new ChessMove(start, end, null);
-//            serverFacade.makeMove(new AuthData(authData.authToken()), gameID, move);
 //            return "";
 //        } else {
 //            return "Move <start-position> <end-position>";
 //        }
+//    }
+
+    private ChessPosition convertPosition(String positionString) {
+        int row = 0;
+        int col = 0;
+        switch (positionString.charAt(0)) {
+            case 'a': {
+                col = 1;
+                break;
+            }
+            case 'b': {
+                col = 2;
+                break;
+            }
+            case 'c': {
+                col = 3;
+                break;
+            }
+            case 'd': {
+                col = 4;
+                break;
+            }
+            case 'e': {
+                col = 5;
+                break;
+            }
+            case 'f': {
+                col = 6;
+                break;
+            }
+            case 'g': {
+                col = 7;
+                break;
+            }
+            case 'h': {
+                col = 8;
+                break;
+            }
+        }
+        row = Character.getNumericValue(positionString.charAt(1));
+        return new ChessPosition(row, col);
+    }
+
+
+//    private boolean isValidPosition(String positionString) {
+//        if (positionString.length() != 2) {
+//            return false;
+//        }
+//        Set<Character> charSet = new HashSet<>();
+//        // Add characters 'a' to 'h'
+//        for (char c = 'a'; c <= 'h'; c++) {
+//            charSet.add(c);
+//        }
+//        // Add characters '1' to '8'
+//        for (char c = '1'; c <= '8'; c++) {
+//            charSet.add(c);
+//        }
+//        return charSet.contains(positionString.charAt(0)) && charSet.contains(positionString.charAt(1));
 //    }
 
 }
