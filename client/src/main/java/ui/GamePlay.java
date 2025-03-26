@@ -26,7 +26,20 @@ public class GamePlay {
         WHITE, BLACK, OBSERVER
     }
 
-    private Perspective playerPerspective = Perspective.OBSERVER;
+    private Perspective playerPerspective;
+
+    public GamePlay(String serverURL, String authData, String playerColor) {
+        this.serverURL = serverURL;
+        this.serverFacade = new ServerFacade(serverURL);
+        this.authData = authData;
+        if ("black".equalsIgnoreCase(playerColor)) {
+            this.playerPerspective = Perspective.BLACK;
+        } else if ("white".equalsIgnoreCase(playerColor)) {
+            this.playerPerspective = Perspective.WHITE;
+        } else {
+            this.playerPerspective = Perspective.OBSERVER;
+        }
+    }
 
     public GamePlay(String serverURL, String authData) {
         this.serverURL = serverURL;
@@ -36,7 +49,21 @@ public class GamePlay {
 
     public void setPlayerPerspective(Perspective perspective) {
         this.playerPerspective = perspective;
+        System.out.println("Player perspective set to: " + perspective);
+        System.out.println(drawBoard(chessGame)); // Display the board based on the player's perspective
     }
+
+    // public void postLogin(String playerColor) {
+    //     // ...existing code...
+    //     if ("black".equalsIgnoreCase(playerColor)) {
+    //         setPlayerPerspective(Perspective.BLACK);
+    //     } else if ("white".equalsIgnoreCase(playerColor)) {
+    //         setPlayerPerspective(Perspective.WHITE);
+    //     } else {
+    //         setPlayerPerspective(Perspective.OBSERVER);
+    //     }
+    //     // ...existing code...
+    // }
 
     public String eval(String input) {
         var tokens = input.toLowerCase().split(" ");
@@ -176,7 +203,7 @@ public class GamePlay {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 8; col >= 1; col--) {
                     ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
+                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_BLUE : SET_BG_COLOR_BLACK;
                     String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
                     result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
                 }
@@ -191,7 +218,7 @@ public class GamePlay {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 1; col <= 8; col++) {
                     ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
+                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_LIGHT_GREY;
                     String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
                     result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
                 }

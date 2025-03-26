@@ -88,7 +88,8 @@ public class PostLogin {
             GameData res = serverFacade.createGame(req);
             //GameData res = serverFacade.createGame(req);
             int gameID = res.gameID();
-            return String.format("Created Game: %s (id: %s)", gameName, gameID);
+            //return String.format("Created Game: %s (id: %s)", gameName, gameID);
+            return String.format("Created Game: %s", gameName);
         }
         throw new ResponseException(400, "Expected: create <game_name>");
     }
@@ -124,7 +125,12 @@ public class PostLogin {
 
             this.state = 2;
             this.gameID = gameID;
-            return String.format("Joined Game: %d as %s", gameID, playerColor);
+
+            // Pass the player's color to GamePlay
+            GamePlay gamePlay = new GamePlay(serverURL, authData);
+            gamePlay.setPlayerPerspective(playerColor.equals("black") ? GamePlay.Perspective.BLACK : GamePlay.Perspective.WHITE);
+
+            return String.format("Joined Game: %d as %s", gameNumber, playerColor);
         }
         throw new ResponseException(400, "Expected: join <black or white> <game_number>");
     }
@@ -173,6 +179,9 @@ public class PostLogin {
                 }
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
+
+                GamePlay gamePlay = new GamePlay(serverURL, authData);
+                gamePlay.setPlayerPerspective(GamePlay.Perspective.OBSERVER);
                 return String.format("Observing Game: %s", gameName);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "Invalid game number format. Expected: observe <game_number>");
