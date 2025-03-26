@@ -51,12 +51,12 @@ public class GameService {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
 
-        if (Objects.equals(joinRequest.playerColor(), "WHITE")) {
+        if (Objects.equals(joinRequest.playerColor().toUpperCase(), "WHITE")) {
             if (whiteUsername != null) {
                 throw new DataAccessException("Error: already taken");
             }
             whiteUsername = authData.username();
-        } else if (Objects.equals(joinRequest.playerColor(), "BLACK")) {
+        } else if (Objects.equals(joinRequest.playerColor().toUpperCase(), "BLACK")) {
             if (blackUsername != null) {
                 throw new DataAccessException("Error: already taken");
             }

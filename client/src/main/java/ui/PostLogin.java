@@ -14,6 +14,7 @@ import server.ServerFacade;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class PostLogin {
 
@@ -42,7 +43,7 @@ public class PostLogin {
             return switch (cmd) {
                 case "logout" -> logout(params);
                 case "list" -> listGames(params);
-                case "create" -> createGame(params);
+                case "create" -> createGame();
                 case "join" -> updateGame(params);
                 case "quit" -> "quit";
                 default -> help();
@@ -67,19 +68,23 @@ public class PostLogin {
         if (params.length == 0) {
             serverFacade.logoutUser();
             state = 0;
-            return "Logged out";
+            return "Logged out successfully";
         }
         throw new ResponseException(400, "Expected: logout");
     }
 
 
-    public String createGame(String... params) throws ResponseException {
+    public String createGame() throws ResponseException {
+        System.out.println("create <game name>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
         if (params.length == 1) {
-            //GameData info = new GameData(gameData, authData, authData, authData, null); // added authData as a parameter to GameData constructor to fix compilation error 
             String gameName = params[0];
             GameName req = new GameName(gameName);
-            //CreateGameResult res = serverFacade.createGame(req, info);
             GameData res = serverFacade.createGame(req);
+            //GameData res = serverFacade.createGame(req);
             int gameID = res.gameID();
             return String.format("Created Game: %s (id: %s)", gameName, gameID);
         }
@@ -122,7 +127,7 @@ public class PostLogin {
     public String listGames(String... params) throws ResponseException {
         if (params.length == 0) {
             StringBuilder result = new StringBuilder("GAMES LIST:\n");
-            Collection<GameDataResult> gamesList = serverFacade.listGames(authData);
+            Collection<GameDataResult> gamesList = serverFacade.listGames();
             for (GameDataResult game : gamesList) {
                 result.append("Game ID: ").append(game.gameID()).append("\n");
                 result.append("Game Name: ").append(game.gameName()).append("\n");

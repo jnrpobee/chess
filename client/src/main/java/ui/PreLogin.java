@@ -28,7 +28,7 @@ public class PreLogin {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login" -> signIn(params);
+                case "login" -> signIn();
                 case "quit" -> "quit";
                 case "register" -> register();
                 default -> help();
@@ -47,7 +47,13 @@ public class PreLogin {
                 """;
     }
 
-    public String signIn(String... params) throws ResponseException {
+    public String signIn() throws ResponseException {
+        System.out.println("Enter <username> <password>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
+
         if (params.length == 2) {
             String username = params[0];
             String password = params[1];
