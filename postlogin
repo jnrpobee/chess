@@ -10,6 +10,7 @@ import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
@@ -120,7 +121,7 @@ public class PostLogin {
             }
 
             JoinGameRequest joinTheGame = new JoinGameRequest(gameID, playerColor);
-            serverFacade.joinGame(joinTheGame, authData);
+            serverFacade.joinGame(joinTheGame);
 
             this.state = 2;
             this.gameID = gameID;
@@ -133,7 +134,7 @@ public class PostLogin {
     public String listGames(String... params) throws ResponseException {
         if (params.length == 0) {
             StringBuilder result = new StringBuilder("GAMES LIST:\n");
-            Collection<GameDataResult> gamesList = serverFacade.listGames(authData);
+            Collection<GameDataResult> gamesList = serverFacade.listGames();
             gameNumberToID.clear(); // Clear previous mappings
             int gameNumber = 1;
             for (GameDataResult game : gamesList) {
@@ -160,7 +161,7 @@ public class PostLogin {
                     throw new ResponseException(404, "Game not found with number: " + gameNumber);
                 }
                 int gameID = gameNumberToID.get(gameNumber);
-                Collection<GameDataResult> gamesList = serverFacade.listGames(authData);
+                Collection<GameDataResult> gamesList = serverFacade.listGames();
                 String gameName = null;
                 for (GameDataResult game : gamesList) {
                     if (game.gameID() == gameID) {
@@ -173,7 +174,7 @@ public class PostLogin {
                 }
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
-                return String.format("Observing Game: %s", gameName);
+                return String.format("Observing Game: %s (id: %d)", gameName, gameID);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "Invalid game number format. Expected: observe <game_number>");
             }

@@ -21,12 +21,21 @@ public class GameService {
     // DAO instances for accessing game and authentication data
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
-    private int gameID = 100000;
+    private int gameID;
 
     // Constructor to initialize DAOs
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
+        try {
+            gameID = 100000;
+            int numGame = gameDAO.getAllGame().size();
+            if (numGame != 0) {
+                gameID += numGame;
+            }
+        } catch (DataAccessException e) {
+            gameID = 100000;
+        }
     }
 
     // Method to create a new game
