@@ -34,7 +34,7 @@ public class PreLogin {
                 default -> help();
             };
         } catch (ResponseException ex) {
-            return ex.getMessage();
+            return "Failed! try again";
         }
     }
 

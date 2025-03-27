@@ -2,7 +2,6 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
-import model.AuthData;
 import server.ServerFacade;
 
 import static ui.EscapeSequences.*;
@@ -62,20 +61,21 @@ public class GamePlay {
         return switch (cmd) {
             case "exit" -> {
                 exitGame();
-                yield "Exited Gameplay UI.";
+                yield "Exited Gameplay";
             }
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
             case "highlight" -> highlightMoves(chessGame, params);
+            case "Quit" -> "quit";
             default -> "";
         };
-
     }
 
     public String help() {
         return """
                 - Help
-                - exit
+                - Quit
+                - Exit
                 - Draw
                 - Move
                 - Highlight
@@ -85,9 +85,8 @@ public class GamePlay {
 
     public void exitGame() {
         this.state = 1; // Set state to 1 to return to postLogin
-        System.out.println("Exiting Gameplay. Returning to postLogin.");
+        System.out.println("Returning to postLogin.");
     }
-
 
     public String highlightMoves(ChessGame game, String... params) {
         if (params.length != 1 || !isValidPosition(params[0])) {

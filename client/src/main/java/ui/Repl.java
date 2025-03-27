@@ -38,7 +38,7 @@ public class Repl {
                 System.out.print(gamePlay.help());
             }
 
-            if (state.equals("gamePlay") && result.equals("exit")) {
+            if (state.equals("gamePlay") && result.equals("Exited Gameplay")) {
                 postLogin.state = 1; // Return to postLogin state
                 state = "postLogin";
             } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
@@ -78,11 +78,12 @@ public class Repl {
                     result = gamePlay.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Optionally return to postLogin or quit
-                    if (result.equals("quit")) {
+                    if (result.equals("Exited Gameplay")) {
                         state = "postLogin";
                         System.out.println("\nReturning to post-login phase...");
                         System.out.print(postLogin.help());
                     }
+
                 }
             } catch (Throwable e) {
                 System.out.print(e.getMessage());
