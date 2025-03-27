@@ -98,11 +98,6 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-//            try (InputStream respErr = http.getErrorStream()) {
-//                if (respErr != null) {
-//                    throw ResponseException.fromJson(respErr);
-//                }
-//            }
 
             throw new ResponseException(status, "other failure: " + status);
         }
