@@ -44,7 +44,7 @@ public class Repl {
             } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
                 postLogin.state = 0; // Return to preLogin state
                 preLogin.state = 0;
-                System.out.print(result + preLogin.help());
+                System.out.print(preLogin.help());
                 state = "preLogin";
             }
 
@@ -97,9 +97,5 @@ public class Repl {
     private void printPrompt() {
         System.out.print(SET_TEXT_BOLD + SET_TEXT_COLOR_YELLOW + "> ");
     }
-//
-//}
-//
-
 
 }
