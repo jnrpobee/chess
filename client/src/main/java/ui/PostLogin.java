@@ -14,6 +14,8 @@ import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ui.EscapeSequences.*;
+
 public class PostLogin {
 
     private final String serverURL;
@@ -55,6 +57,7 @@ public class PostLogin {
 
 
     public String help() {
+        System.out.println("\n " + SET_TEXT_BOLD + "PostLogin Help Menu");
         return """
                 - Help
                 - Quit

@@ -5,6 +5,7 @@ import model.AuthData;
 import model.UserData;
 import result.LoginRequest;
 import server.ServerFacade;
+import static ui.EscapeSequences.*;
 
 
 import java.util.Arrays;
@@ -39,6 +40,7 @@ public class PreLogin {
     }
 
     public String help() {
+        System.out.println("\n " + SET_TEXT_BOLD + "PreLogin Help Menu");
         return """
                 - Help
                 - Quit
