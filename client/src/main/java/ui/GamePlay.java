@@ -59,10 +59,11 @@ public class GamePlay {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "exit" -> {
-                exitGame();
-                yield "Exited Gameplay";
-            }
+//            case "exit" -> {
+//                exitGame();
+//                yield "Exited Gameplay";
+//            }
+            case "exit" -> exitGame();
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
             case "highlight" -> highlightMoves(chessGame, params);
@@ -83,9 +84,10 @@ public class GamePlay {
     }
 
 
-    public void exitGame() {
+    public String exitGame() {
         this.state = 1; // Set state to 1 to return to postLogin
         System.out.println("Returning to postLogin.");
+        return "Exited Gameplay";
     }
 
     public String highlightMoves(ChessGame game, String... params) {
@@ -140,7 +142,7 @@ public class GamePlay {
 
         if (playerPerspective == Perspective.BLACK) {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY)
-                    .append("   h  g   f   e   d   c  b   a").append(RESET_BG_COLOR).append("\n");
+                    .append("   h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
             for (int row = 1; row <= 8; row++) {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 8; col >= 1; col--) {
@@ -152,7 +154,7 @@ public class GamePlay {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ").append(row)
                         .append(RESET_BG_COLOR).append("\n");
             }
-            result.append("   h  g   f   e   d   c  b   a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            result.append("  h   g  f   e   d   c   b  a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         } else {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY)
                     .append("   a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");

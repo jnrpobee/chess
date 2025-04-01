@@ -79,7 +79,9 @@ public class Repl {
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Optionally return to postLogin or quit
                     if (result.equals("Exited Gameplay")) {
-                        state = "postLogin";
+                        state = "postLogin"; 
+                        postLogin.state = 1; // this line of code is added to return to postLogin state
+                        gamePlay.state = 0; // Reset gamePlay state
                         System.out.println("\nReturning to post-login phase...");
                         System.out.print(postLogin.help());
                     }
