@@ -67,21 +67,21 @@ public class GamePlay {
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
             case "highlight" -> highlightMoves(chessGame, params);
-            case "Quit" -> "quit";
+            //case "Quit" -> "quit";
             default -> "";
         };
     }
 
     public String help() {
         System.out.println("\n " + SET_TEXT_BOLD + "Gameplay Help Menu");
-        //System.out.println(SET_TEXT_COLOR_WHITE);
         return """
-                - Help
-                - Quit
                 - Exit
+                - Help
                 - Draw
                 - Move
                 - Highlight
+                - Leave
+                - Resign
                 """;
     }
 
