@@ -2,7 +2,10 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
+import model.AuthData;
 import server.ServerFacade;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 import static ui.EscapeSequences.*;
 
@@ -15,12 +18,15 @@ import java.util.Set;
 public class GamePlay {
     private final String serverURL;
 
-    private ChessGame chessGame = new ChessGame();
+    private final ChessGame chessGame = new ChessGame();
+    private WebSocketFacade ws;
 
     public int gameID;
     public int state = 2;
     public String authData;
     private final ServerFacade serverFacade;
+
+    private final NotificationHandler notificationHandler;
 
     public enum Perspective {
         WHITE, BLACK, OBSERVER
@@ -28,10 +34,11 @@ public class GamePlay {
 
     private Perspective playerPerspective;
 
-    public GamePlay(String serverURL, String authData, String playerColor) {
+    public GamePlay(String serverURL, String authData, String playerColor, NotificationHandler notificationHandler) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
+        this.notificationHandler = notificationHandler;
         if ("black".equalsIgnoreCase(playerColor)) {
             this.playerPerspective = Perspective.BLACK;
         } else if ("white".equalsIgnoreCase(playerColor)) {
@@ -41,10 +48,11 @@ public class GamePlay {
         }
     }
 
-    public GamePlay(String serverURL, String authData) {
+    public GamePlay(String serverURL, String authData, NotificationHandler notificationHandler) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
+        this.notificationHandler = notificationHandler;
     }
 
     public void setPlayerPerspective(Perspective perspective) {
@@ -67,6 +75,9 @@ public class GamePlay {
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
             case "highlight" -> highlightMoves(chessGame, params);
+//            case "leave" -> leaveGame();
+//            case "resign" -> resignGame();
+//            case "move" -> makeMove(params);
             //case "Quit" -> "quit";
             default -> "";
         };
@@ -194,6 +205,37 @@ public class GamePlay {
                 return EMPTY;
         }
     }
+
+//    public String makeMove(String... params) throws ResponseException {
+//        if (params.length == 2) {
+//            this.ws = new WebSocketFacade(serverURL, notificationHandler);
+//            String startPos = params[0].toLowerCase();
+//            String endPos = params[1].toLowerCase();
+//            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
+//                return "Enter valid position letter a-h number 1-8:";
+//            }
+//            ChessPosition start = convertPosition(startPos);
+//            ChessPosition end = convertPosition(endPos);
+//            ChessMove move = new ChessMove(start, end, null);
+//            ws.makeMove(new AuthData(authData), gameID, move);
+//            return "";
+//        } else {
+//            return "Format: move <start-position> <end-position>";
+//        }
+//    }
+//
+//    public String leaveGame() throws ResponseException {
+//        this.ws = new WebSocketFacade(serverURL, notificationHandler);
+//        ws.leaveGame(new AuthData(authData), gameID);
+//        this.state = 1;
+//        return "Left the game";
+//    }
+//
+//    public String resignGame() throws ResponseException {
+//        this.ws = new WebSocketFacade(serverURL, notificationHandler);
+//        ws.resignGame(new AuthData(authData), gameID);
+//        return "Resigned from game";
+//    }
 
     private ChessPosition convertPosition(String positionString) {
         int row;

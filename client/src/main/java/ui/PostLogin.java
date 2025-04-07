@@ -7,6 +7,8 @@ import model.JoinGameRequest;
 import result.GameDataResult;
 import result.GameName;
 import server.ServerFacade;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +25,8 @@ public class PostLogin {
     public int state = 1;
     String authData;
     private int gameData;
+    private WebSocketFacade ws;
+    private final NotificationHandler notificationHandler;
 
     private final ServerFacade serverFacade;
 
@@ -30,10 +34,11 @@ public class PostLogin {
 
     private final Map<Integer, Integer> gameNumberToID = new HashMap<>();
 
-    public PostLogin(String serverURL, String authData) {
+    public PostLogin(String serverURL, String authData, NotificationHandler notificationHandler) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
+        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input) {
@@ -105,6 +110,7 @@ public class PostLogin {
         var tokens = line.toLowerCase().split(" ");
         var params = Arrays.copyOfRange(tokens, 0, tokens.length);
         if (params.length == 2) {
+            this.ws = new WebSocketFacade(serverURL, notificationHandler);
             String playerColor = params[0];
             int gameNumber;
             try {
@@ -130,7 +136,7 @@ public class PostLogin {
             this.gameID = gameID;
 
             // Pass the player's color to GamePlay
-            GamePlay gamePlay = new GamePlay(serverURL, authData);
+            GamePlay gamePlay = new GamePlay(serverURL, authData, notificationHandler);
             gamePlay.setPlayerPerspective(playerColor.equals("black") ? GamePlay.Perspective.BLACK : GamePlay.Perspective.WHITE);
 
             return String.format("Joined Game: %d as %s", gameNumber, playerColor);
@@ -183,7 +189,7 @@ public class PostLogin {
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
 
-                GamePlay gamePlay = new GamePlay(serverURL, authData);
+                GamePlay gamePlay = new GamePlay(serverURL, authData, notificationHandler);
                 gamePlay.setPlayerPerspective(GamePlay.Perspective.OBSERVER);
                 return String.format("Observing Game: %s", gameName);
             } catch (NumberFormatException e) {

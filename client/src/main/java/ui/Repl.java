@@ -1,21 +1,25 @@
 package ui;
 
+import com.google.gson.Gson;
+import websocket.NotificationHandler;
+import websocket.messages.*;
+
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl {
+public class Repl implements NotificationHandler {
     private final PreLogin preLogin;
     private final PostLogin postLogin;
     private final GamePlay gamePlay;
-    private int state;
+    //private int state;
 
 
     public Repl(String serverUrl) {
 
         preLogin = new PreLogin(serverUrl);
-        postLogin = new PostLogin(serverUrl, preLogin.getAuth());
-        gamePlay = new GamePlay(serverUrl, this.toString());
+        postLogin = new PostLogin(serverUrl, preLogin.getAuth(), this);
+        gamePlay = new GamePlay(serverUrl, this.toString(), this);
     }
 
     public void run() {
@@ -79,7 +83,7 @@ public class Repl {
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Optionally return to postLogin or quit
                     if (result.equals("Exited Gameplay")) {
-                        state = "postLogin"; 
+                        state = "postLogin";
                         postLogin.state = 1; // this line of code is added to return to postLogin state
                         gamePlay.state = 0; // Reset gamePlay state
                         System.out.println("\nReturning to post-login phase...");
@@ -98,6 +102,32 @@ public class Repl {
 
     private void printPrompt() {
         System.out.print(SET_TEXT_BOLD + SET_TEXT_COLOR_YELLOW + "> ");
+    }
+
+
+    @Override
+    public void handle(String message) {
+        ServerMessage sm = new Gson().fromJson(message, ServerMessage.class);
+        switch (sm.getServerMessageType()) {
+            case ERROR: {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.getErrorMessage());
+                break;
+            }
+            case NOTIFICATION: {
+                NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
+                printPrompt();
+                break;
+            }
+            case LOAD_GAME: {
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gamePlay.drawBoard(loadGameMessage.getGame()));
+                System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+                printPrompt();
+                break;
+            }
+        }
     }
 
 }
