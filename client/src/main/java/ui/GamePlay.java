@@ -62,7 +62,7 @@ public class GamePlay {
     }
 
 
-    public String eval(String input) {
+    public String eval(String input) throws ResponseException {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -75,9 +75,9 @@ public class GamePlay {
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
             case "highlight" -> highlightMoves(chessGame, params);
-//            case "leave" -> leaveGame();
-//            case "resign" -> resignGame();
-//            case "move" -> makeMove(params);
+            case "leave" -> leaveGame();
+            case "resign" -> resignGame();
+            case "move" -> makeMove(params);
             //case "Quit" -> "quit";
             default -> "";
         };
@@ -206,36 +206,36 @@ public class GamePlay {
         }
     }
 
-//    public String makeMove(String... params) throws ResponseException {
-//        if (params.length == 2) {
-//            this.ws = new WebSocketFacade(serverURL, notificationHandler);
-//            String startPos = params[0].toLowerCase();
-//            String endPos = params[1].toLowerCase();
-//            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
-//                return "Enter valid position letter a-h number 1-8:";
-//            }
-//            ChessPosition start = convertPosition(startPos);
-//            ChessPosition end = convertPosition(endPos);
-//            ChessMove move = new ChessMove(start, end, null);
-//            ws.makeMove(new AuthData(authData), gameID, move);
-//            return "";
-//        } else {
-//            return "Format: move <start-position> <end-position>";
-//        }
-//    }
-//
-//    public String leaveGame() throws ResponseException {
-//        this.ws = new WebSocketFacade(serverURL, notificationHandler);
-//        ws.leaveGame(new AuthData(authData), gameID);
-//        this.state = 1;
-//        return "Left the game";
-//    }
-//
-//    public String resignGame() throws ResponseException {
-//        this.ws = new WebSocketFacade(serverURL, notificationHandler);
-//        ws.resignGame(new AuthData(authData), gameID);
-//        return "Resigned from game";
-//    }
+    public String makeMove(String... params) throws ResponseException {
+        if (params.length == 2) {
+            this.ws = new WebSocketFacade(serverURL, notificationHandler);
+            String startPos = params[0].toLowerCase();
+            String endPos = params[1].toLowerCase();
+            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
+                return "Enter valid position letter a-h number 1-8:";
+            }
+            ChessPosition start = convertPosition(startPos);
+            ChessPosition end = convertPosition(endPos);
+            ChessMove move = new ChessMove(start, end, null);
+            ws.makeMove(new AuthData(authData, endPos), gameID, move);
+            return "";
+        } else {
+            return "Format: move <start-position> <end-position>";
+        }
+    }
+
+    public String leaveGame() throws ResponseException {
+        this.ws = new WebSocketFacade(serverURL, notificationHandler);
+        ws.leaveGame(new AuthData(authData, authData), gameID);
+        this.state = 1;
+        return "Left the game";
+    }
+
+    public String resignGame() throws ResponseException {
+        this.ws = new WebSocketFacade(serverURL, notificationHandler);
+        ws.resignGame(new AuthData(authData, authData), gameID);
+        return "Resigned from game";
+    }
 
     private ChessPosition convertPosition(String positionString) {
         int row;

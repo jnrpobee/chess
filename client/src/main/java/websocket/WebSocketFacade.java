@@ -52,49 +52,41 @@ public class WebSocketFacade extends Endpoint {
 
 //    public void connect(AuthData auth, int gameID, ChessGame.TeamColor teamColor) throws ResponseException {
 //        try {
-//            var cmd = new connectCommand(auth.getAuthToken(), gameID, teamColor);
+//            var cmd = new connectCommand(auth.authToken(), gameID, teamColor);
 //            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
 //        } catch (IOException ex) {
 //            throw new ResponseException(500, ex.getMessage());
 //        }
 //    }
-//
-////    public void joinObserver(AuthData auth, int gameID) throws ResponseException {
-////        try {
-////            var cmd = new JoinObserverCommand(auth.getAuthToken(), gameID);
-////            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-////        } catch (IOException ex) {
-////            throw new ResponseException(500, ex.getMessage());
-////        }
-////    }
-//
-//    public void leaveGame(AuthData auth, int gameID) throws ResponseException {
-//        try {
-//            var cmd = new LeaveCommand(auth.getAuthToken(), gameID);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-//        } catch (IOException e) {
-//            throw new ResponseException(500, e.getMessage());
-//        }
-//    }
-//
-//    public void resignGame(AuthData auth, int gameID) throws ResponseException {
-//        try {
-//            var cmd = new ResignCommand(auth.getAuthToken(), gameID);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-//        } catch (IOException e) {
-//            throw new ResponseException(500, e.getMessage());
-//        }
-//    }
-//
-//    public void makeMove(AuthData auth, int gameID, ChessMove move) throws ResponseException {
-//        try {
-//            var cmd = new MakeMoveCommand(auth.getAuthToken(), gameID, move);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-//        } catch (IOException e) {
-//            throw new ResponseException(500, e.getMessage());
-//        }
-//    }
-//
-//
+
+
+    public void leaveGame(AuthData auth, int gameID) throws ResponseException {
+        try {
+            var cmd = new LeaveCommand(auth.authToken(), gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void resignGame(AuthData auth, int gameID) throws ResponseException {
+        try {
+            var cmd = new ResignCommand(auth.authToken(), gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void makeMove(AuthData auth, int gameID, ChessMove move) throws ResponseException {
+        try {
+            var cmd = new MakeMoveCommand(auth.authToken(), gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+
 }
 //
