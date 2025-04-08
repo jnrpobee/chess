@@ -19,6 +19,10 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
                 Objects.equals(gameName, gameData.gameName);
     }
 
+    public ChessGame getGame() {
+        return game;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(gameID, whiteUsername, blackUsername, gameName);

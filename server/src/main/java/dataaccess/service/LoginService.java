@@ -39,4 +39,8 @@ public class LoginService {
         }
 
     }
+
+    public String getUser(String authString) throws DataAccessException {
+        return authDAO.getAuth(authString).username();
+    }
 }

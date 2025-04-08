@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 //import service.AuthData;
 import model.AuthData;
-import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.*;
 
@@ -36,7 +35,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                    ServerMessage notificationMessage = new Gson().fromJson(message, ServerMessage.class);
                     NotificationHandler.handle(message);
                 }
             });
@@ -50,14 +49,14 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-//    public void connect(AuthData auth, int gameID, ChessGame.TeamColor teamColor) throws ResponseException {
-//        try {
-//            var cmd = new connectCommand(auth.authToken(), gameID, teamColor);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
+    public void connect(String auth, int gameID, ChessGame.TeamColor teamColor) throws ResponseException {
+        try {
+            var cmd = new ConnectCommand(auth, gameID, teamColor);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 
 
     public void leaveGame(AuthData auth, int gameID) throws ResponseException {

@@ -35,7 +35,7 @@ public class UserGameCommand {
         return commandType;
     }
 
-    public String getAuthToken() {
+    public String getAuthString() {
         return authToken;
     }
 
@@ -53,12 +53,12 @@ public class UserGameCommand {
         }
         UserGameCommand that = (UserGameCommand) o;
         return getCommandType() == that.getCommandType() &&
-                Objects.equals(getAuthToken(), that.getAuthToken()) &&
+                Objects.equals(getAuthString(), that.getAuthString()) &&
                 Objects.equals(getGameID(), that.getGameID());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCommandType(), getAuthToken(), getGameID());
+        return Objects.hash(getCommandType(), getAuthString(), getGameID());
     }
 }

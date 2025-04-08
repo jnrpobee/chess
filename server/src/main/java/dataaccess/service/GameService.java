@@ -102,5 +102,15 @@ public class GameService {
     public AuthData getAuthData(String authToken) throws DataAccessException {
         return authDAO.getAuth(authToken);
     }
+
+    public Object getGame(Integer gameID) throws DataAccessException {
+        return gameDAO.getGame(gameID);
+    }
+
+    public void updateGame(GameData game) throws DataAccessException {
+        gameDAO.updateGame(game);
+    }
+
+
 }
 
