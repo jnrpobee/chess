@@ -296,4 +296,32 @@ public class GamePlay {
         return charSet.contains(positionString.charAt(0)) && charSet.contains(positionString.charAt(1));
     }
 
+    public int getGameID() {
+        return gameID;
+    }
+
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public String getAuthData() {
+        return authData;
+    }
+
+    public void setAuthData(String authData) {
+        this.authData = authData;
+    }
+
+    public Perspective getPlayerPerspective() {
+        return playerPerspective;
+    }
+
 }
