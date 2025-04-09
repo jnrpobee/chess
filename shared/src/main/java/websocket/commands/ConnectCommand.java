@@ -7,20 +7,13 @@ public class ConnectCommand extends UserGameCommand {
 
     public ConnectCommand(String authData, int gameID, ChessGame.TeamColor playerColor) {
         super(CommandType.CONNECT, authData, gameID);
+        // if (playerColor == null) {
+        //     throw new IllegalArgumentException("Player color cannot be null");
+        // }
         this.playerColor = playerColor;
     }
 
     public ChessGame.TeamColor getPlayerColor() {
         return playerColor;
     }
-
-    // @Override
-    // public String toString() {
-    //     return "ConnectCommand{" +
-    //             "authData='" + authData + '\'' +
-    //             ", gameID=" + gameID +
-    //             ", playerColor=" + playerColor +
-    //             ", commandType=" + commandType +
-    //             '}';
-    // }
 }

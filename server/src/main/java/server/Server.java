@@ -7,6 +7,7 @@ import dataaccess.mysql.*;
 
 import dataaccess.service.*;
 import dataaccess.memory.*;
+import server.websocket.WebSocketHandler;
 import spark.*;
 import dataaccess.*;
 import model.*;
@@ -25,6 +26,7 @@ public class Server {
     private final LogoutService logoutService;
     private final ClearService clearService;
     private final GameService gameService;
+    private final WebSocketHandler webSocketHandler;
 
     //DAO instances
 
@@ -55,6 +57,7 @@ public class Server {
         logoutService = new LogoutService(authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         gameService = new GameService(gameDAO, authDAO);
+        webSocketHandler = new WebSocketHandler(gameService, loginService);
 
     }
 
@@ -64,6 +67,8 @@ public class Server {
         Spark.staticFiles.location("web");
         //This line initializes the server and can be removed once you have a functioning endpoint 
         //Spark.init();
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.post("/user", this::registration);

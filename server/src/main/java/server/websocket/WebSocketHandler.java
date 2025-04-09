@@ -131,14 +131,21 @@ public class WebSocketHandler {
     public void connect(ConnectCommand connectCommand, Session session) throws DataAccessException, IOException {
         String username = loginService.getUser(connectCommand.getAuthString());
         connections.add(0, username, session);
+
+        // if (connectCommand.getPlayerColor() == null) {
+        //     var message = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Player color is required");
+        //     connections.sendMessage(0, new Gson().toJson(message));
+        //     return;
+        // }
+
         var gameData = this.gameService.getGame(connectCommand.getGameID());
         if (!username.equals(getUsername(gameData, connectCommand.getPlayerColor()))) {
             var message = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Can't join as " + connectCommand.getPlayerColor().toString());
-            connections.sendMessage(0, new Gson().toJson(message));
+            connections.sendMessage(connectCommand.getGameID(), new Gson().toJson(message));
         } else {
             var text = String.format("Player %s has joined as %s%n", username, connectCommand.getPlayerColor());
             var notification = new NotificationMessage(null, text);
-            connections.broadcast(0, username, notification);
+            connections.broadcast(connectCommand.getGameID(), username, notification);
             sendGame((GameData) gameData, connectCommand.getPlayerColor(), username);
         }
     }
