@@ -88,7 +88,6 @@ public class WebSocketHandler {
 
 
     public void makeMove(MakeMoveCommand command) throws ResponseException, DataAccessException {
-        //MakeMoveCommand cmd = new Gson().fromJson(message, MakeMoveCommand.class);
         int gameID = command.getGameID();
         String auth = command.getAuthString();
         String username = loginService.getUser(auth);
@@ -96,6 +95,7 @@ public class WebSocketHandler {
         GameData gameData = (GameData) gameService.getGame(gameID);
         ChessMove move = command.getMove();
         ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+
         if ((game.getTeamTurn() == ChessGame.TeamColor.WHITE && !(Objects.equals(gameData.whiteUsername(), username))) ||
                 (game.getTeamTurn() == ChessGame.TeamColor.BLACK && !(Objects.equals(gameData.blackUsername(), username)))) {
             try {
@@ -114,71 +114,70 @@ public class WebSocketHandler {
             }
             return;
         }
+
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
             try {
-                connections.sendError(auth, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid move"));
+                var invalidMoveMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid move");
+                connections.sendError(username, invalidMoveMessage);
             } catch (IOException ex) {
                 throw new ResponseException(500, ex.getMessage());
             }
             return;
         }
 
-        // game.setTeamTurn(game.getTeamTurn() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
-        // gameService.setGame(gameID, new AuthData(auth), game);
+        // Notify all clients about the move
+        var notificationMessage = String.format("Player %s has moved %s from %s to %s", username, piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationMessage);
 
-        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message1);
-        game = ((GameData) gameService.getGame(gameID)).getGame();
+        try {
+            connections.broadcast(gameID, auth, notification);
+        } catch (IOException e) {
+            throw new ResponseException(500, "Failed to broadcast move notification: " + e.getMessage());
+        }
+
+        // Send updated game state to all clients
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        try {
+            connections.sendLoadCommand(gameID, loadGameMessage);
+        } catch (IOException e) {
+            throw new ResponseException(500, "Failed to send updated game state: " + e.getMessage());
+        }
 
-        if (game.isInCheck(ChessGame.TeamColor.BLACK)
-        ) {
-            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black is in check!");
-            try {
-                connections.broadcast(gameID, null, checkNotification);
-            } catch (IOException e) {
-                throw new ResponseException(500, e.getMessage());
-            }
-        }
-        if (game.isInCheck(ChessGame.TeamColor.WHITE)
-        ) {
-            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White is in check!");
-            try {
-                connections.broadcast(gameID, null, checkNotification);
-            } catch (IOException e) {
-                throw new ResponseException(500, e.getMessage());
-            }
-        }
-        // Check for checkmate and notify players if necessary 
-        if (game.isInCheckmate(ChessGame.TeamColor.BLACK))
-        {
+        // Check for check or checkmate and notify players if necessary
+        if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
             game.setTeamTurn(null);
-            setGame(gameID, new AuthData(auth, auth) , game);
+            setGame(gameID, new AuthData(auth, auth), game);
             var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!");
             try {
                 connections.broadcast(gameID, null, endGameNotification);
             } catch (IOException e) {
                 throw new ResponseException(500, e.getMessage());
             }
-        }
-        if (game.isInCheckmate(ChessGame.TeamColor.WHITE))
-        {
+        } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
             game.setTeamTurn(null);
-            setGame(gameID, new AuthData(auth, auth) , game);
+            setGame(gameID, new AuthData(auth, auth), game);
             var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!");
             try {
                 connections.broadcast(gameID, null, endGameNotification);
             } catch (IOException e) {
                 throw new ResponseException(500, e.getMessage());
             }
-        }
-        try {
-            connections.broadcast(gameID, auth, notification);
-            connections.sendLoadCommand(gameID, loadGameMessage);
-        } catch (IOException e) {
-            throw new ResponseException(400, "makeMove wsHandler: " + e.getMessage());
+        } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
         }
     }
 
@@ -223,10 +222,6 @@ public class WebSocketHandler {
         str += (pos.getRow());
         return str;
     }
-
-
-
-
 
 
 
@@ -292,28 +287,29 @@ public class WebSocketHandler {
 
     public void setGame(int gameID, AuthData auth, ChessGame game) throws DataAccessException, ResponseException {
         // Validate if the game exists
-        if (gameService.getGame(gameID) == null) {
+        GameData gameData = (GameData) gameService.getGame(gameID);
+        if (gameData == null) {
             throw new ResponseException(400, "No game with that ID");
         }
 
         // Validate authorization
-        GameData gameData = (GameData) gameService.getGame(gameID);
         if (!gameData.whiteUsername().equals(auth.username()) && !gameData.blackUsername().equals(auth.username())) {
             throw new ResponseException(401, "Unauthorized to update this game");
         }
+
         // Validate if the game is in progress
         if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
             throw new ResponseException(400, "Game is already over");
         }
-        
 
         // Update the game in the service
-        gameService.updateGame(new GameData(gameID, auth.username(), auth.username(), "DefaultGameName", game));
+        gameService.updateGame(new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+
         // Notify all clients about the game update
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                 String.format("Game %d has been updated.", gameID));
         try {
-            connections.broadcast(gameID, auth.username(), notification);
+            connections.broadcast(gameID, null, notification);
         } catch (IOException e) {
             throw new ResponseException(500, "Failed to broadcast game update: " + e.getMessage());
         }
