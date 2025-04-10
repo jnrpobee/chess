@@ -41,6 +41,7 @@ public class ConnectionManager {
         }
     }
 
+    
     public void sendMessage(int gameID, String message) throws IOException {
         var connectionsList = connections.get(gameID);
         if (connectionsList != null) {
@@ -49,6 +50,12 @@ public class ConnectionManager {
                     conn.send(message);
                 }
             }
+        }
+    }
+
+    public void sendMessageToSession(Session session, String message) throws IOException {
+        if (session != null && session.isOpen()) {
+            session.getRemote().sendString(message);
         }
     }
 

@@ -46,6 +46,7 @@ public class WebSocketHandler {
         try {
             JsonObject obj = JsonParser.parseString(message).getAsJsonObject();
             UserGameCommand.CommandType type = UserGameCommand.CommandType.valueOf(obj.get("commandType").getAsString());
+            int gameID = (obj.get("gameID").getAsInt());
             switch (type) {
                 case CONNECT -> connect(new Gson().fromJson(message, ConnectCommand.class), session);
                 case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class));
@@ -74,7 +75,7 @@ public class WebSocketHandler {
         gameService.updateGame((GameData) gameData);
 
         var message = new NotificationMessage(null, String.format("Player %s has resigned the game.", username));
-        connections.broadcast(0, null, message);
+        connections.broadcast(command.getGameID(), null, message);
     }
 
     private void leaveGame(LeaveCommand leaveCommand) throws DataAccessException, IOException {
@@ -94,10 +95,8 @@ public class WebSocketHandler {
         ChessGame game = ((GameData) gameService.getGame(gameID)).getGame();
         GameData gameData = (GameData) gameService.getGame(gameID);
         ChessMove move = command.getMove();
-        //ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
-
-
-        if ((game.getTeamTurn() == ChessGame.TeamColor.WHITE && !(Objects.equals(gameData.blackUsername(), username))) ||
+        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+        if ((game.getTeamTurn() == ChessGame.TeamColor.WHITE && !(Objects.equals(gameData.whiteUsername(), username))) ||
                 (game.getTeamTurn() == ChessGame.TeamColor.BLACK && !(Objects.equals(gameData.blackUsername(), username)))) {
             try {
                 connections.sendError(auth, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: not your turn"));
@@ -125,29 +124,162 @@ public class WebSocketHandler {
             }
             return;
         }
+
+        // game.setTeamTurn(game.getTeamTurn() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
+        // gameService.setGame(gameID, new AuthData(auth), game);
+
+        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message1);
+        game = ((GameData) gameService.getGame(gameID)).getGame();
+        var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+
+        if (game.isInCheck(ChessGame.TeamColor.BLACK)
+        ) {
+            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        if (game.isInCheck(ChessGame.TeamColor.WHITE)
+        ) {
+            var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        // Check for checkmate and notify players if necessary 
+        if (game.isInCheckmate(ChessGame.TeamColor.BLACK))
+        {
+            game.setTeamTurn(null);
+            setGame(gameID, new AuthData(auth, auth) , game);
+            var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!");
+            try {
+                connections.broadcast(gameID, null, endGameNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE))
+        {
+            game.setTeamTurn(null);
+            setGame(gameID, new AuthData(auth, auth) , game);
+            var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!");
+            try {
+                connections.broadcast(gameID, null, endGameNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        try {
+            connections.broadcast(gameID, auth, notification);
+            connections.sendLoadCommand(gameID, loadGameMessage);
+        } catch (IOException e) {
+            throw new ResponseException(400, "makeMove wsHandler: " + e.getMessage());
+        }
+    }
+
+    public String convertPos(ChessPosition pos)
+    {
+        String str = "";
+        switch (pos.getColumn())
+        {
+            case 1: {
+                str += "a";
+                break;
+            }
+            case 2: {
+                str += "b";
+                break;
+            }
+            case 3: {
+                str += "c";
+                break;
+            }
+            case 4: {
+                str += "d";
+                break;
+            }
+            case 5: {
+                str += "e";
+                break;
+            }
+            case 6: {
+                str += "f";
+                break;
+            }
+            case 7: {
+                str += "g";
+                break;
+            }
+            case 8: {
+                str += "h";
+                break;
+            }
+        }
+        str += (pos.getRow());
+        return str;
     }
 
 
+
+
+
+
+
+
+
+
     public void connect(ConnectCommand connectCommand, Session session) throws DataAccessException, IOException {
-        String username = loginService.getUser(connectCommand.getAuthString());
-        connections.add(0, username, session);
+        String username;
+        GameData gameData;
 
-        // if (connectCommand.getPlayerColor() == null) {
-        //     var message = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Player color is required");
-        //     connections.sendMessage(0, new Gson().toJson(message));
-        //     return;
-        // }
-
-        var gameData = this.gameService.getGame(connectCommand.getGameID());
-        if (!username.equals(getUsername(gameData, connectCommand.getPlayerColor()))) {
-            var message = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Can't join as " + connectCommand.getPlayerColor().toString());
-            connections.sendMessage(connectCommand.getGameID(), new Gson().toJson(message));
-        } else {
-            var text = String.format("Player %s has joined as %s%n", username, connectCommand.getPlayerColor());
-            var notification = new NotificationMessage(null, text);
-            connections.broadcast(connectCommand.getGameID(), username, notification);
-            sendGame((GameData) gameData, connectCommand.getPlayerColor(), username);
+        try {
+            username = loginService.getUser(connectCommand.getAuthString());
+            gameData = (GameData) this.gameService.getGame(connectCommand.getGameID());
+        } catch (Exception e) {
+            // Send LOAD_GAME message with error details to root client
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: " + e.getMessage());
+            // Removed unused variable loadGameMessage
+            // Include error message in the serialized JSON instead of calling a non-existent method
+            connections.sendMessageToSession(session, new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.LOAD_GAME, errorMessage.getErrorMessage())));
+            return;
         }
+
+        // Check if the user is allowed to rejoin the game
+        if (gameData.game().getTeamTurn() == ChessGame.TeamColor.NONE) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Cannot rejoin a game that has ended.");
+            connections.sendMessageToSession(session, new Gson().toJson(errorMessage));
+            return;
+        }
+
+        connections.add(connectCommand.getGameID(), username, session);
+
+        // Send LOAD_GAME message to root client
+        sendGameToSession(gameData, session);
+
+        // Determine if the user is joining as a player or observer
+        ChessGame.TeamColor playerColor = null;
+        if (username.equals(gameData.whiteUsername())) {
+            playerColor = ChessGame.TeamColor.WHITE;
+        } else if (username.equals(gameData.blackUsername())) {
+            playerColor = ChessGame.TeamColor.BLACK;
+        }
+
+        // Send Notification to other clients
+        String role = (playerColor != null) ? playerColor.toString() : "an observer";
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format("Player %s has joined as %s.", username, role));
+        connections.broadcast(connectCommand.getGameID(), username, notification);
+    }
+
+    private void sendGameToSession(GameData game, Session session) throws IOException {
+        var message = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game.game());
+        //message.setPlayerColor(game.game().getTeamTurn());
+        connections.sendMessageToSession(session, new Gson().toJson(message));
     }
 
     private String getUsername(Object gameData, ChessGame.TeamColor playerColor) {
@@ -158,11 +290,33 @@ public class WebSocketHandler {
         }
     }
 
-    public void sendGame(GameData game, ChessGame.TeamColor color, String player) throws IOException {
-        var message = new LoadGameMessage(game);
-        message.setColor(color);
-        connections.sendMessage(0, new Gson().toJson(message));
-    }
+    public void setGame(int gameID, AuthData auth, ChessGame game) throws DataAccessException, ResponseException {
+        // Validate if the game exists
+        if (gameService.getGame(gameID) == null) {
+            throw new ResponseException(400, "No game with that ID");
+        }
 
+        // Validate authorization
+        GameData gameData = (GameData) gameService.getGame(gameID);
+        if (!gameData.whiteUsername().equals(auth.username()) && !gameData.blackUsername().equals(auth.username())) {
+            throw new ResponseException(401, "Unauthorized to update this game");
+        }
+        // Validate if the game is in progress
+        if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
+            throw new ResponseException(400, "Game is already over");
+        }
+        
+
+        // Update the game in the service
+        gameService.updateGame(new GameData(gameID, auth.username(), auth.username(), "DefaultGameName", game));
+        // Notify all clients about the game update
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format("Game %d has been updated.", gameID));
+        try {
+            connections.broadcast(gameID, auth.username(), notification);
+        } catch (IOException e) {
+            throw new ResponseException(500, "Failed to broadcast game update: " + e.getMessage());
+        }
+    }
 
 }

@@ -3,6 +3,7 @@ package ui;
 import chess.*;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import server.ServerFacade;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;

@@ -134,7 +134,7 @@ public class PostLogin {
 
             // Pass the game ID to the WebSocket connection
             // and set the player color
-            ws.connect(authData, gameID, null);
+            ws.connect(authData, gameID);
 
             this.state = 2;
             this.gameID = gameID;

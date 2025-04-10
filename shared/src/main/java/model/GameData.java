@@ -4,7 +4,8 @@ import chess.ChessGame;
 
 import java.util.Objects;
 
-public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName,
+                       ChessGame game) {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -26,5 +27,16 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     @Override
     public int hashCode() {
         return Objects.hash(gameID, whiteUsername, blackUsername, gameName);
+    }
+
+    @Override
+    public String toString() {
+        return "GameData{" +
+                "gameID=" + gameID +
+                ", whiteUsername='" + whiteUsername + '\'' +
+                ", blackUsername='" + blackUsername + '\'' +
+                ", gameName='" + gameName + '\'' +
+                ", game=" + game +
+                '}';
     }
 }
