@@ -25,8 +25,6 @@ import websocket.commands.*;
 import java.io.IOException;
 import java.util.Objects;
 
-import javax.management.Notification;
-
 
 @WebSocket
 public class WebSocketHandler {
@@ -93,19 +91,6 @@ public class WebSocketHandler {
             gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
         }
 
-        // Update the teamTurn to NONE if no players remain for that team
-//        if (gameData.whiteUsername() == null && gameData.blackUsername() == null) {
-//            gameData.game().setTeamTurn(ChessGame.TeamColor.NONE);
-//        } else if (gameData.whiteUsername() != null && gameData.blackUsername() == null) {
-//            gameData.game().setTeamTurn(ChessGame.TeamColor.WHITE);
-//        } else if (gameData.whiteUsername() == null && gameData.blackUsername() != null) {
-//            gameData.game().setTeamTurn(ChessGame.TeamColor.BLACK);
-//        } else if (gameData.whiteUsername() != null && gameData.blackUsername() != null) {
-//            // Ensure the team turn is set to the new player's turn
-//            if (gameData.game().getTeamTurn() == ChessGame.TeamColor.NONE) {
-//                gameData.game().setTeamTurn(ChessGame.TeamColor.WHITE);
-//            }
-//        }
 
         gameService.updateGame(gameData);
         connections.removeSessionFromGame(leaveCommand.getGameID(), leaveCommand.getAuthString());
@@ -113,7 +98,6 @@ public class WebSocketHandler {
         int gameID = leaveCommand.getGameID();
         connections.broadcast(gameID, leaveCommand.getAuthString(), notification); // Exclude the leaving user from receiving the notification
     }
-
 
     public void makeMove(MakeMoveCommand command) throws ResponseException, DataAccessException {
         int gameID = command.getGameID();
@@ -314,14 +298,6 @@ public class WebSocketHandler {
         // Update the game in the service
         gameService.updateGame(new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
 
-        // Notify all clients about the game update
-//        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-//                String.format("Game %d has been updated.", gameID));
-//        try {
-//            connections.broadcast(gameID, null, notification);
-//        } catch (IOException e) {
-//            throw new ResponseException(500, "Failed to broadcast game update: " + e.getMessage());
-//        }
     }
 
 }
