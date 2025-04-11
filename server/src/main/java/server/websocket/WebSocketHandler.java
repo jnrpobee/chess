@@ -142,7 +142,8 @@ public class WebSocketHandler {
         }
 
         // Notify all clients about the move
-        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
+        var message1 = String.format("Player %s has moved %s from %s to %s", username,
+                piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message1);
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
 
@@ -232,7 +233,8 @@ public class WebSocketHandler {
         } catch (Exception e) {
             // Send LOAD_GAME message with error details to root client
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: " + e.getMessage());
-            connections.sendMessageToSession(session, new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.LOAD_GAME, errorMessage.getErrorMessage())));
+            connections.sendMessageToSession(session,
+                    new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.LOAD_GAME, errorMessage.getErrorMessage())));
             return;
         }
 

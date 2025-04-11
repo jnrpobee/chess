@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
@@ -34,25 +34,6 @@ public class ConnectionManager {
         tmp.removeIf(conn -> Objects.equals(conn.authToken, authToken));
     }
 
-    public void removeSession(Session session) {
-        for (int key : connections.keySet()) {
-            Set<Connection> tmp = connections.get(key);
-            tmp.removeIf(conn -> conn.session == session);
-            connections.put(key, tmp);
-        }
-    }
-
-
-    public void sendMessage(int gameID, String message) throws IOException {
-        var connectionsList = connections.get(gameID);
-        if (connectionsList != null) {
-            for (var conn : connectionsList) {
-                if (conn.session.isOpen()) {
-                    conn.send(message);
-                }
-            }
-        }
-    }
 
     public void sendMessageToSession(Session session, String message) throws IOException {
         if (session != null && session.isOpen()) {
@@ -100,26 +81,6 @@ public class ConnectionManager {
         }
     }
 
-    public void sendOneLoadCommand(int gameID, String authToken, LoadGameMessage loadGameMessage) throws IOException {
-        var removeList = new HashSet<Connection>();
-        for (var c : connections.get(gameID)) {
-            if (c.session.isOpen()) {
-                if (c.authToken.equals(authToken)) {
-                    String msg = new Gson().toJson(loadGameMessage, LoadGameMessage.class);
-                    c.send(msg);
-                }
-            } else {
-                removeList.add(c);
-            }
-        }
-
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            Set<Connection> tmp = connections.get(gameID);
-            tmp.remove(c);
-            connections.put(gameID, tmp);
-        }
-    }
 
     public void sendError(String authToken, ErrorMessage errorMessage) throws IOException {
         var removeList = new HashSet<Connection>();

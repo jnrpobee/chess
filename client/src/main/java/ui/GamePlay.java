@@ -68,10 +68,6 @@ public class GamePlay {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-//            case "exit" -> {
-//                exitGame();
-//                yield "Exited Gameplay";
-//            }
             case "exit" -> exitGame();
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
