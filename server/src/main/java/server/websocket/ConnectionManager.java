@@ -2,7 +2,6 @@ package server.websocket;
 
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.*;
 
@@ -41,7 +40,7 @@ public class ConnectionManager {
         }
     }
 
-    
+
     public void sendMessage(int gameID, String message) throws IOException {
         var connectionsList = connections.get(gameID);
         if (connectionsList != null) {
