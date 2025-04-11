@@ -11,7 +11,4 @@ public class ConnectCommand extends UserGameCommand {
 
     }
 
-//    public ChessGame.TeamColor getPlayerColor() {
-//        return playerColor;
-//    }
 }

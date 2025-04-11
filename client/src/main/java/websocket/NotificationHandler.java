@@ -3,6 +3,6 @@ package websocket;
 import websocket.messages.*;
 
 public interface NotificationHandler {
-    void handle(String message);
+    static void handle(String message);
 }
 
