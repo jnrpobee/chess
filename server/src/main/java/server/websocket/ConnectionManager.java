@@ -6,19 +6,21 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Integer, ArrayList<Connection>> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, Set<Connection>> connections = new ConcurrentHashMap<>();
 
 
     public void add(int gameID, String authToken, Session session) {
         var connection = new Connection(authToken, session);
-        ArrayList<Connection> tmp = connections.get(gameID);
+        Set<Connection> tmp = connections.get(gameID);
         if (tmp == null) {
-            ArrayList<Connection> tmp2 = new ArrayList<>();
+            Set<Connection> tmp2 = new HashSet<>();
             tmp2.add(connection);
             connections.put(gameID, tmp2);
         } else {
@@ -28,13 +30,13 @@ public class ConnectionManager {
     }
 
     public void removeSessionFromGame(int gameID, String authToken) {
-        ArrayList<Connection> tmp = connections.get(gameID);
+        Set<Connection> tmp = connections.get(gameID);
         tmp.removeIf(conn -> Objects.equals(conn.authToken, authToken));
     }
 
     public void removeSession(Session session) {
         for (int key : connections.keySet()) {
-            ArrayList<Connection> tmp = connections.get(key);
+            Set<Connection> tmp = connections.get(key);
             tmp.removeIf(conn -> conn.session == session);
             connections.put(key, tmp);
         }
@@ -59,7 +61,7 @@ public class ConnectionManager {
     }
 
     public void broadcast(int gameID, String excludeUser, NotificationMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        var removeList = new HashSet<Connection>();
         for (var c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 if (!c.authToken.equals(excludeUser)) {
@@ -73,14 +75,14 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            ArrayList<Connection> tmp = connections.get(gameID);
+            Set<Connection> tmp = connections.get(gameID);
             tmp.remove(c);
             connections.put(gameID, tmp);
         }
     }
 
     public void sendLoadCommand(int gameID, LoadGameMessage loadGameMessage) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        var removeList = new HashSet<Connection>();
         for (var c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 String msg = new Gson().toJson(loadGameMessage, LoadGameMessage.class);
@@ -92,14 +94,14 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            ArrayList<Connection> tmp = connections.get(gameID);
+            Set<Connection> tmp = connections.get(gameID);
             tmp.remove(c);
             connections.put(gameID, tmp);
         }
     }
 
     public void sendOneLoadCommand(int gameID, String authToken, LoadGameMessage loadGameMessage) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        var removeList = new HashSet<Connection>();
         for (var c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 if (c.authToken.equals(authToken)) {
@@ -113,14 +115,14 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            ArrayList<Connection> tmp = connections.get(gameID);
+            Set<Connection> tmp = connections.get(gameID);
             tmp.remove(c);
             connections.put(gameID, tmp);
         }
     }
 
     public void sendError(String authToken, ErrorMessage errorMessage) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        var removeList = new HashSet<Connection>();
         for (int gameID : connections.keySet()) {
             for (var c : connections.get(gameID)) {
                 if (c.session.isOpen()) {
@@ -135,7 +137,7 @@ public class ConnectionManager {
 
             // Clean up any connections that were left open.
             for (var c : removeList) {
-                ArrayList<Connection> tmp = connections.get(gameID);
+                Set<Connection> tmp = connections.get(gameID);
                 tmp.remove(c);
                 connections.put(gameID, tmp);
             }
