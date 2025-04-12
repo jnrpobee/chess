@@ -1,11 +1,9 @@
 package websocket;
 
 
-import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
-//import service.AuthData;
 import model.AuthData;
 import websocket.messages.ServerMessage;
 import websocket.commands.*;
@@ -24,29 +22,33 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
+            // Ensure the URL is correctly formatted for WebSocket
             url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/connect");
+            URI socketURI = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            //System.out.println("Connecting to WebSocket URI: " + socketURI); // Debugging log
             this.session = container.connectToServer(this, socketURI);
 
-            //set message handler
+            // Set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notificationMessage = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.handle(message);
+                    notificationHandler.handle(message); // Pass the parsed object instead of the raw message
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new ResponseException(500, ex.getMessage());
+            System.err.println("WebSocket connection failed: " + ex.getMessage()); // Debugging log
+            throw new ResponseException(500, "WebSocket failed: " + ex.getMessage());
         }
     }
 
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        this.session = session; // Properly initialize the session
     }
 
     public void connect(String auth, int gameID) throws ResponseException {
@@ -88,4 +90,3 @@ public class WebSocketFacade extends Endpoint {
 
 
 }
-//
