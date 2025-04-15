@@ -10,10 +10,7 @@ import websocket.WebSocketFacade;
 
 import static ui.EscapeSequences.*;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class GamePlay {
@@ -73,11 +70,10 @@ public class GamePlay {
                 case "exit" -> exitGame();
                 case "help" -> help();
                 case "draw" -> drawBoard(chessGame);
-                case "move" -> makeMove(params);
+                case "move" -> makeMove();
                 case "highlight" -> highlightMoves(chessGame, params);
                 case "leave" -> leaveGame();
                 case "resign" -> resignGame();
-                //case "Quit" -> "quit";
                 default -> "";
             };
         } catch (ResponseException ex) {
@@ -157,7 +153,7 @@ public class GamePlay {
 
         if (playerPerspective == Perspective.BLACK) {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
-                    .append("   h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
+                    .append("  h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
             for (int row = 1; row <= 8; row++) {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 8; col >= 1; col--) {
@@ -170,9 +166,9 @@ public class GamePlay {
                         .append(RESET_BG_COLOR).append("\n");
             }
             result.append("  h   g  f   e   d   c   b  a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
-        } else {
+        } else if (playerPerspective == Perspective.OBSERVER) {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
-                    .append("\n   a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
+                    .append("\n  a   b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
             for (int row = 8; row >= 1; row--) {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 1; col <= 8; col++) {
@@ -184,7 +180,22 @@ public class GamePlay {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ")
                         .append(row).append(RESET_BG_COLOR).append("\n");
             }
-            result.append("   a  b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+            result.append("  a   b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
+        } else {
+            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
+                    .append("\n  a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
+            for (int row = 8; row >= 1; row--) {
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
+                for (int col = 1; col <= 8; col++) {
+                    ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_LIGHT_GREY;
+                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
+                    result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
+                }
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ")
+                        .append(row).append(RESET_BG_COLOR).append("\n");
+            }
+            result.append("  a  b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         }
         return result.toString();
     }
@@ -208,7 +219,12 @@ public class GamePlay {
         }
     }
 
-    public String makeMove(String... params) throws ResponseException {
+    public String makeMove() throws ResponseException {
+        System.out.println("move <start-position> <end-position>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
         if (params.length == 2) {
             this.ws = new WebSocketFacade(serverURL, notificationHandler);
             String startPos = params[0].toLowerCase();
@@ -227,7 +243,8 @@ public class GamePlay {
             try {
                 chessGame.makeMove(move);
             } catch (InvalidMoveException e) {
-                return "Invalid move: " + e.getMessage();
+                return e.getMessage();
+                //return "Invalid move: " + e.getMessage();
             }
 
             // Display the updated board

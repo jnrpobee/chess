@@ -83,7 +83,7 @@ public class Repl implements NotificationHandler {
                         System.out.print(preLogin.help());
                     }
                     // Transition to gamePlay if game starts
-                    else if (result.matches("Observing Game: \\s+") || result.matches("Joined Game: \\d+ as \\w+")) {
+                    else if (result.matches("Observing Game: \\w+") || result.matches("Joined Game: \\d+ as \\w+")) {
                         state = "gamePlay";
                         System.out.println("\nEntering gameplay phase...");
                         System.out.print(gamePlay.help());

@@ -198,8 +198,10 @@ public class PostLogin {
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
 
-                gameplay = new GamePlay(serverURL, authData, notificationHandler);
+                gameplay.setAuthData(authData);
                 gameplay.setPlayerPerspective(GamePlay.Perspective.OBSERVER);
+                gameplay.setGameID(gameID);
+
                 return String.format("Observing Game: %s", gameName);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "Invalid game number format. Expected: observe <game_number>");
