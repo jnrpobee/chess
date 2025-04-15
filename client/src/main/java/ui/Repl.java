@@ -1,6 +1,7 @@
 package ui;
 
 import com.google.gson.Gson;
+import result.LoginRequest;
 import websocket.NotificationHandler;
 import websocket.messages.*;
 
@@ -35,25 +36,26 @@ public class Repl implements NotificationHandler {
         String result = "";
 
         while (!result.equals("quit")) {
-            if (preLogin.state == 1 && !state.equals("postLogin")) {
-                state = "postLogin";
-                System.out.println("\nTransitioning to postLogin phase...");
-                System.out.print(postLogin.help());
-            } else if (postLogin.state == 2 && !state.equals("gamePlay")) {
-                state = "gamePlay";
-                System.out.println("\nTransitioning to gameplay phase...");
-                System.out.print(gamePlay.help());
-            }
+            // if (preLogin.state == 1 && !state.equals("postLogin")) {
+            //     state = "postLogin";
+            //     System.out.println("\nTransitioning to postLogin phase...");
+            //     System.out.print(postLogin.help());
+            // } else if (postLogin.state == 2 && !state.equals("gamePlay")) {
+            //     state = "gamePlay";
+            //     System.out.println("\nTransitioning to gameplay phase...");
+            //     System.out.print(gamePlay.help());
+            // }
 
-            if (state.equals("gamePlay") && result.equals("Left the game")) {
-                postLogin.state = 1; // Return to postLogin state
-                state = "postLogin";
-            } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
-                postLogin.state = 0; // Return to preLogin state
-                preLogin.state = 0;
-                System.out.print(preLogin.help());
-                state = "preLogin";
-            }
+            // if (state.equals("gamePlay") && result.equals("Left the game")) {
+            //     gamePlay.state = 1;
+            //     postLogin.state = 1; // Return to postLogin state
+            //     state = "postLogin";
+            // } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
+            //     postLogin.state = 0; // Return to preLogin state
+            //     preLogin.state = 0;
+            //     System.out.print(preLogin.help());
+            //     state = "preLogin";
+            // }
 
             postLogin.authData = preLogin.getAuth();
             printPrompt();
@@ -64,19 +66,24 @@ public class Repl implements NotificationHandler {
                     result = preLogin.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Transition to postLogin if login is successful
-                    if (result.equals("login")) {
+                    if (result.startsWith(String.format("You signed in as %s.", preLogin.getUsername())) ||
+                            result.startsWith(String.format("Registered user %s", preLogin.getUsername()))) {
                         state = "postLogin";
                         System.out.println("\nEntering post-login phase...");
                         System.out.print(postLogin.help());
-                    } else if (result.equals("logout")) {
+                    } else if (result.equals("Logged out successfully")) {
                         state = "preLogin";
                         System.out.print(preLogin.help());
                     }
                 } else if (state.equals("postLogin")) {
                     result = postLogin.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
+                    if (result.equals("Logged out successfully")) {
+                        state = "preLogin";
+                        System.out.print(preLogin.help());
+                    }
                     // Transition to gamePlay if game starts
-                    if (result.equals("observe") || result.equals("join")) {
+                    else if (result.matches("Observing Game: \\s+") || result.matches("Joined Game: \\d+ as \\w+")) {
                         state = "gamePlay";
                         System.out.println("\nEntering gameplay phase...");
                         System.out.print(gamePlay.help());
@@ -87,8 +94,8 @@ public class Repl implements NotificationHandler {
                     // Optionally return to postLogin or quit
                     if (result.equals("Left the game")) {
                         state = "postLogin";
-                        postLogin.state = 1; // this line of code is added to return to postLogin state
-                        gamePlay.state = 0; // Reset gamePlay state
+//                        postLogin.state = 1; // this line of code is added to return to postLogin state
+//                        gamePlay.state = 0; // Reset gamePlay state
                         System.out.println("\nReturning to post-login phase...");
                         System.out.print(postLogin.help());
                     }
@@ -128,7 +135,7 @@ public class Repl implements NotificationHandler {
                 LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                 System.out.println(EscapeSequences.SET_BG_COLOR_WHITE +
                         EscapeSequences.SET_TEXT_COLOR_BLACK + gamePlay.drawBoard(loadGameMessage.getGame()));
-                System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+                //System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
                 printPrompt();
                 break;
             }

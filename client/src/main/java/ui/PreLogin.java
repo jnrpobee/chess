@@ -5,6 +5,7 @@ import model.AuthData;
 import model.UserData;
 import result.LoginRequest;
 import server.ServerFacade;
+
 import static ui.EscapeSequences.*;
 
 
@@ -14,6 +15,7 @@ import java.util.Scanner;
 public class PreLogin {
     private final String serverURL;
     int state = 0;
+    private String username;
 
     public String auth = null;
     private final ServerFacade serverFacade;
@@ -63,7 +65,9 @@ public class PreLogin {
             AuthData res = serverFacade.loginUser(loginRequest);
             this.auth = res.authToken();
             state = 1;
+            setUsername(username); //added this line
             return String.format("You signed in as %s.", username);
+
         }
         throw new ResponseException(400, "Expected: <username> <password>");
     }
@@ -87,9 +91,19 @@ public class PreLogin {
             AuthData registration = serverFacade.registerUser(user);
             this.auth = registration.authToken();
             state = 1;
+            setUsername(username); //added this line
             return String.format("Registered user %s", username);
         }
         throw new ResponseException(400, "Expected: <username> <password> <email>");
+    }
+
+    //added sections below
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
 

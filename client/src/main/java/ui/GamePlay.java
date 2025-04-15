@@ -60,25 +60,29 @@ public class GamePlay {
     public void setPlayerPerspective(Perspective perspective) {
         this.playerPerspective = perspective;
         System.out.println("Player perspective set to: " + perspective);
-        System.out.println(drawBoard(chessGame)); // Display the board based on the player's perspective
+        //System.out.println(drawBoard(chessGame)); // Display the board based on the player's perspective
     }
 
 
     public String eval(String input) throws ResponseException {
-        var tokens = input.toLowerCase().split(" ");
-        var cmd = (tokens.length > 0) ? tokens[0] : "help";
-        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (cmd) {
-            case "exit" -> exitGame();
-            case "help" -> help();
-            case "draw" -> drawBoard(chessGame);
-            case "move" -> makeMove(params);
-            case "highlight" -> highlightMoves(chessGame, params);
-            case "leave" -> leaveGame();
-            case "resign" -> resignGame();
-            //case "Quit" -> "quit";
-            default -> "";
-        };
+        try {
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "exit" -> exitGame();
+                case "help" -> help();
+                case "draw" -> drawBoard(chessGame);
+                case "move" -> makeMove(params);
+                case "highlight" -> highlightMoves(chessGame, params);
+                case "leave" -> leaveGame();
+                case "resign" -> resignGame();
+                //case "Quit" -> "quit";
+                default -> "";
+            };
+        } catch (ResponseException ex) {
+            return "Failed! try again";
+        }
     }
 
     public String help() {
@@ -152,7 +156,7 @@ public class GamePlay {
         ChessBoard board = game.getBoard();
 
         if (playerPerspective == Perspective.BLACK) {
-            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY)
+            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
                     .append("   h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
             for (int row = 1; row <= 8; row++) {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
@@ -167,8 +171,8 @@ public class GamePlay {
             }
             result.append("  h   g  f   e   d   c   b  a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         } else {
-            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY)
-                    .append("   a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
+            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
+                    .append("\n   a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
             for (int row = 8; row >= 1; row--) {
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 1; col <= 8; col++) {

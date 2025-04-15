@@ -80,7 +80,7 @@ public class PostLogin {
     public String logout(String... params) throws ResponseException {
         if (params.length == 0) {
             serverFacade.logoutUser();
-            this.state = 0;
+            state = 0;
             return "Logged out successfully";
         }
         throw new ResponseException(400, "Expected: logout");
