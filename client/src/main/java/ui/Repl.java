@@ -18,8 +18,11 @@ public class Repl implements NotificationHandler {
     public Repl(String serverUrl) {
 
         preLogin = new PreLogin(serverUrl);
-        postLogin = new PostLogin(serverUrl, preLogin.getAuth(), this);
-        gamePlay = new GamePlay(serverUrl, this.toString(), this);
+        gamePlay = new GamePlay(serverUrl, preLogin.getAuth(), this);
+        postLogin = new PostLogin(serverUrl, preLogin.getAuth(), this, gamePlay);
+        //gamePlay = new GamePlay(serverUrl, postLogin.getAuth(), this);
+        //this.state = 0; // Initialize state to 0 (preLogin)
+        //gamePlay = new GamePlay(serverUrl, this.toString(), this);
     }
 
     public void run() {
@@ -42,7 +45,7 @@ public class Repl implements NotificationHandler {
                 System.out.print(gamePlay.help());
             }
 
-            if (state.equals("gamePlay") && result.equals("Exited Gameplay")) {
+            if (state.equals("gamePlay") && result.equals("Left the game")) {
                 postLogin.state = 1; // Return to postLogin state
                 state = "postLogin";
             } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
@@ -73,7 +76,7 @@ public class Repl implements NotificationHandler {
                     result = postLogin.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Transition to gamePlay if game starts
-                    if (result.equals("observe")) {
+                    if (result.equals("observe") || result.equals("join")) {
                         state = "gamePlay";
                         System.out.println("\nEntering gameplay phase...");
                         System.out.print(gamePlay.help());
@@ -82,7 +85,7 @@ public class Repl implements NotificationHandler {
                     result = gamePlay.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                     // Optionally return to postLogin or quit
-                    if (result.equals("Exited Gameplay")) {
+                    if (result.equals("Left the game")) {
                         state = "postLogin";
                         postLogin.state = 1; // this line of code is added to return to postLogin state
                         gamePlay.state = 0; // Reset gamePlay state
@@ -105,57 +108,30 @@ public class Repl implements NotificationHandler {
     }
 
 
-   @Override
-   public void handle(String message) {
-       ServerMessage sm = new Gson().fromJson(message, ServerMessage.class);
-       switch (sm.getServerMessageType()) {
-           case ERROR: {
-               ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
-               System.out.println(errorMessage.getErrorMessage());
-               break;
-           }
-           case NOTIFICATION: {
-               NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-               System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
-               printPrompt();
-               break;
-           }
+    @Override
+    public void handle(String message) {
+        ServerMessage sm = new Gson().fromJson(message, ServerMessage.class);
+        switch (sm.getServerMessageType()) {
+            case ERROR: {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.getErrorMessage());
+                break;
+            }
+            case NOTIFICATION: {
+                NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
+                printPrompt();
+                break;
+            }
 
-           case LOAD_GAME: {
-               LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
-               System.out.println(EscapeSequences.SET_BG_COLOR_WHITE +
-                       EscapeSequences.SET_TEXT_COLOR_BLACK + gamePlay.drawBoard(loadGameMessage.getGame()));
-               System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
-               printPrompt();
-               break;
-           }
-       }
-   }
-
-    // @Override
-    // public void handle(ServerMessage notificationMessage) {
-    //     ServerMessage sm = notificationMessage;
-    //     switch (sm.getServerMessageType()) {
-    //         case ERROR: {
-    //             ErrorMessage errorMessage = new Gson().fromJson(new Gson().toJson(notificationMessage), ErrorMessage.class);
-    //             System.out.println(errorMessage.getErrorMessage());
-    //             break;
-    //         }
-    //         case NOTIFICATION: {
-    //             NotificationMessage notification = new Gson().fromJson(new Gson().toJson(notificationMessage), NotificationMessage.class);
-    //             System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
-    //             printPrompt();
-    //             break;
-    //         }
-
-    //         case LOAD_GAME: {
-    //             LoadGameMessage loadGameMessage = new Gson().fromJson(new Gson().toJson(notificationMessage), LoadGameMessage.class);
-    //             System.out.println(EscapeSequences.SET_BG_COLOR_WHITE +
-    //                     EscapeSequences.SET_TEXT_COLOR_BLACK + gamePlay.drawBoard(loadGameMessage.getGame()));
-    //             System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
-    //             printPrompt();
-    //             break;
-    //         }
-    //     }
-    // }
+            case LOAD_GAME: {
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                System.out.println(EscapeSequences.SET_BG_COLOR_WHITE +
+                        EscapeSequences.SET_TEXT_COLOR_BLACK + gamePlay.drawBoard(loadGameMessage.getGame()));
+                System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+                printPrompt();
+                break;
+            }
+        }
+    }
 }

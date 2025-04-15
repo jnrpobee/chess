@@ -24,7 +24,7 @@ public class GamePlay {
 
     public int gameID;
     public int state = 2;
-    public String authData;
+    private String authData;
     private final ServerFacade serverFacade;
 
     private final NotificationHandler notificationHandler;
@@ -38,6 +38,7 @@ public class GamePlay {
     public GamePlay(String serverURL, String authData, String playerColor, NotificationHandler notificationHandler) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
+        //ServerFacade serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
         this.notificationHandler = notificationHandler;
         if ("black".equalsIgnoreCase(playerColor)) {
@@ -71,10 +72,10 @@ public class GamePlay {
             case "exit" -> exitGame();
             case "help" -> help();
             case "draw" -> drawBoard(chessGame);
+            case "move" -> makeMove(params);
             case "highlight" -> highlightMoves(chessGame, params);
             case "leave" -> leaveGame();
             case "resign" -> resignGame();
-            case "move" -> makeMove(params);
             //case "Quit" -> "quit";
             default -> "";
         };
@@ -214,8 +215,20 @@ public class GamePlay {
             ChessPosition start = convertPosition(startPos);
             ChessPosition end = convertPosition(endPos);
             ChessMove move = new ChessMove(start, end, null);
+
+            // Send the move to the server
             ws.makeMove(new AuthData(authData, endPos), gameID, move);
-            return "";
+
+            // Update the local board
+            try {
+                chessGame.makeMove(move);
+            } catch (InvalidMoveException e) {
+                return "Invalid move: " + e.getMessage();
+            }
+
+            // Display the updated board
+            System.out.println(drawBoard(chessGame));
+            return "Move made: " + startPos + " to " + endPos;
         } else {
             return "Format: move <start-position> <end-position>";
         }
@@ -223,7 +236,9 @@ public class GamePlay {
 
     public String leaveGame() throws ResponseException {
         this.ws = new WebSocketFacade(serverURL, notificationHandler);
-        ws.leaveGame(new AuthData(authData, authData), gameID);
+        String authToken = getAuthData(); // Dynamically retrieve the auth token
+        int currentGameID = getGameID(); // Dynamically retrieve the current game ID
+        ws.leaveGame(new AuthData(authToken, authToken), currentGameID);
         this.state = 1;
         return "Left the game";
     }

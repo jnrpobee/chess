@@ -88,5 +88,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+//    public void leaveGame(String authData, String authData2) {
+//        // TODO Auto-generated method stub
+//        throw new UnsupportedOperationException("Unimplemented method 'leaveGame'");
+//    }
+
 
 }

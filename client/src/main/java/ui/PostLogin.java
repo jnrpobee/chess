@@ -21,6 +21,7 @@ import static ui.EscapeSequences.*;
 public class PostLogin {
 
     private final String serverURL;
+    private GamePlay gameplay;
 
     public int state = 1;
     String authData;
@@ -30,15 +31,17 @@ public class PostLogin {
 
     private final ServerFacade serverFacade;
 
-    int gameID = 0;
+    int gameID;
 
     private final Map<Integer, Integer> gameNumberToID = new HashMap<>();
 
-    public PostLogin(String serverURL, String authData, NotificationHandler notificationHandler) {
+    public PostLogin(String serverURL, String authData, NotificationHandler notificationHandler, GamePlay gamePlay) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
         this.notificationHandler = notificationHandler;
+        this.gameplay = gamePlay;
+        this.gameID = 0;
     }
 
     public String eval(String input) {
@@ -140,8 +143,10 @@ public class PostLogin {
             this.gameID = gameID;
 
             // Pass the player's color to GamePlay
-            GamePlay gamePlay = new GamePlay(serverURL, authData, notificationHandler);
-            gamePlay.setPlayerPerspective(playerColor.equals("black") ? GamePlay.Perspective.BLACK : GamePlay.Perspective.WHITE);
+            gameplay.setAuthData(authData);
+            gameplay.setPlayerPerspective(playerColor.equals("black") ? GamePlay.Perspective.BLACK : GamePlay.Perspective.WHITE);
+
+            gameplay.setGameID(gameID);
 
             return String.format("Joined Game: %d as %s", gameNumber, playerColor);
         }
@@ -193,8 +198,8 @@ public class PostLogin {
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
 
-                GamePlay gamePlay = new GamePlay(serverURL, authData, notificationHandler);
-                gamePlay.setPlayerPerspective(GamePlay.Perspective.OBSERVER);
+                gameplay = new GamePlay(serverURL, authData, notificationHandler);
+                gameplay.setPlayerPerspective(GamePlay.Perspective.OBSERVER);
                 return String.format("Observing Game: %s", gameName);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "Invalid game number format. Expected: observe <game_number>");
@@ -203,4 +208,7 @@ public class PostLogin {
         throw new ResponseException(400, "Expected: observe <game_number>");
     }
 
+    public String getAuth() {
+        return authData;
+    }
 }
