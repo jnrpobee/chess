@@ -110,7 +110,11 @@ public class GamePlay {
         if (params.length != 1 || !isValidPosition(params[0])) {
             return "Usage: highlight <position>";
         }
-        
+        StringBuilder result = new StringBuilder();
+        ChessBoard board = game.getBoard();
+
+        ChessPosition piecePosition = convertPosition(params[0]);
+        Collection<ChessMove> moves = game.validMoves(piecePosition);
 
         if (playerPerspective == Perspective.BLACK) {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
