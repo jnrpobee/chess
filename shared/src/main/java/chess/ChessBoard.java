@@ -130,5 +130,7 @@ public class ChessBoard {
         }
     }
 
-
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
 }

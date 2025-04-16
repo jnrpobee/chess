@@ -69,9 +69,9 @@ public class GamePlay {
             return switch (cmd) {
                 case "exit" -> exitGame();
                 case "help" -> help();
-                case "draw" -> drawBoard(chessGame);
+                case "redraw" -> drawBoard(chessGame);
                 case "move" -> makeMove();
-                case "highlight" -> highlightMoves(chessGame, params);
+                case "highlight" -> highlightMoves(chessGame);
                 case "leave" -> leaveGame();
                 case "resign" -> resignGame();
                 default -> "";
@@ -86,7 +86,7 @@ public class GamePlay {
         return """
                 - Exit
                 - Help
-                - Draw
+                - Redraw
                 - Move
                 - Highlight
                 - Leave
@@ -101,49 +101,70 @@ public class GamePlay {
         return "Exited Gameplay";
     }
 
-    public String highlightMoves(ChessGame game, String... params) {
+    public String highlightMoves(ChessGame game) {
+        System.out.println("highlight <position>");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        var tokens = line.toLowerCase().split(" ");
+        var params = Arrays.copyOfRange(tokens, 0, tokens.length);
         if (params.length != 1 || !isValidPosition(params[0])) {
             return "Usage: highlight <position>";
         }
-        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK);
-        String[][] board = new String[8][8];
-        ChessBoard board2 = game.getBoard();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = board2.getPiece(new ChessPosition(i + 1, j + 1));
-                board[i][j] = (piece != null) ? getPieceSymbol(piece) : EMPTY;
-            }
-        }
-        ChessPosition piecePosition = convertPosition(params[0]);
-        Collection<ChessMove> moves = game.validMoves(piecePosition);
-        for (ChessMove move : moves) {
-            int row = move.getEndPosition().getRow();
-            int col = move.getEndPosition().getColumn();
-            board[row - 1][col - 1] = "x";
-        }
-        StringBuilder result = new StringBuilder();
+        
+
         if (playerPerspective == Perspective.BLACK) {
-            result.append("  h\u2003g\u2003f\u2003e\u2003d\u2003c\u2003b\u2003a\n");
-            result.append(" +--------------------+\n");
-            for (int i = 0; i < 8; i++) {
-                result.append(i + 1).append("|");
-                for (int j = 7; j >= 0; j--) {
-                    result.append(board[i][j]).append("|");
+            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
+                    .append("  h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
+            for (int row = 1; row <= 8; row++) {
+                final int currentRow = row;
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
+                for (int col = 8; col >= 1; col--) {
+                    final int currentCol = col;
+                    ChessPiece piece = board.getPiece(new ChessPosition(row, currentCol));
+                    String squareColor = (row + currentCol) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_BLUE;
+                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
+
+                    // Highlight valid moves in green
+                    boolean isHighlighted = moves.stream()
+                            .anyMatch(move -> move.getEndPosition().getRow() == currentRow &&
+                                    move.getEndPosition().getColumn() == currentCol);
+                    if (isHighlighted) {
+                        squareColor = SET_BG_COLOR_GREEN;
+                    }
+
+                    result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
                 }
-                result.append("\n");
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ").append(row)
+                        .append(RESET_BG_COLOR).append("\n");
             }
+            result.append("  h   g  f   e   d   c   b  a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         } else {
-            result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
-            result.append(" +--------------------+\n");
-            for (int i = 7; i >= 0; i--) {
-                result.append(i + 1).append("|");
-                for (int j = 0; j < 8; j++) {
-                    result.append(board[i][j]).append("|");
+            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
+                    .append("\n  a   b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
+            for (int row = 8; row >= 1; row--) {
+                final int currentRow = row;
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(currentRow);
+                for (int col = 1; col <= 8; col++) {
+                    final int currentCol = col;
+                    ChessPiece piece = board.getPiece(new ChessPosition(currentRow, currentCol));
+                    String squareColor = (currentRow + currentCol) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_LIGHT_GREY;
+                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
+
+                    // Highlight valid moves in green
+                    boolean isHighlighted = moves.stream()
+                            .anyMatch(move -> move.getEndPosition().getRow() == currentRow &&
+                                    move.getEndPosition().getColumn() == currentCol);
+                    if (isHighlighted) {
+                        squareColor = SET_BG_COLOR_GREEN;
+                    }
+
+                    result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
                 }
-                result.append("\n");
+                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ")
+                        .append(currentRow).append(RESET_BG_COLOR).append("\n");
             }
+            result.append("  a   b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         }
-        result.append(" +--------------------+\n");
         return result.toString();
     }
 
@@ -166,7 +187,7 @@ public class GamePlay {
                         .append(RESET_BG_COLOR).append("\n");
             }
             result.append("  h   g  f   e   d   c   b  a\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
-        } else if (playerPerspective == Perspective.OBSERVER) {
+        } else {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
                     .append("\n  a   b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
             for (int row = 8; row >= 1; row--) {
@@ -181,21 +202,6 @@ public class GamePlay {
                         .append(row).append(RESET_BG_COLOR).append("\n");
             }
             result.append("  a   b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
-        } else {
-            result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
-                    .append("\n  a  b   c   d   e   f  g   h").append(RESET_BG_COLOR).append("\n");
-            for (int row = 8; row >= 1; row--) {
-                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
-                for (int col = 1; col <= 8; col++) {
-                    ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                    String squareColor = (row + col) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_LIGHT_GREY;
-                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
-                    result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
-                }
-                result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(" ")
-                        .append(row).append(RESET_BG_COLOR).append("\n");
-            }
-            result.append("  a  b   c   d   e   f  g   h\n").append(RESET_TEXT_COLOR).append(RESET_BG_COLOR);
         }
         return result.toString();
     }
@@ -247,8 +253,11 @@ public class GamePlay {
                 //return "Invalid move: " + e.getMessage();
             }
 
-            // Display the updated board
+            // Display the updated board for all perspectives
             System.out.println(drawBoard(chessGame));
+            if (playerPerspective == Perspective.OBSERVER) {
+                System.out.println("Observer view updated.");
+            }
             return "Move made: " + startPos + " to " + endPos;
         } else {
             return "Format: move <start-position> <end-position>";
@@ -265,9 +274,19 @@ public class GamePlay {
     }
 
     public String resignGame() throws ResponseException {
-        this.ws = new WebSocketFacade(serverURL, notificationHandler);
-        ws.resignGame(new AuthData(authData, authData), gameID);
-        return "Resigned from game";
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Are you sure you want to resign? (yes/no)");
+        String response = scanner.nextLine().trim().toLowerCase();
+
+        if ("yes".equals(response)) {
+            this.ws = new WebSocketFacade(serverURL, notificationHandler);
+            ws.resignGame(new AuthData(authData, authData), gameID);
+            return "Resigned from game";
+        } else if ("no".equals(response)) {
+            return "Resignation canceled";
+        } else {
+            return "Invalid response. Resignation not processed.";
+        }
     }
 
     private ChessPosition convertPosition(String positionString) {

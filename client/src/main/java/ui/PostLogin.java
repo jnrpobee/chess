@@ -178,6 +178,8 @@ public class PostLogin {
         String line = scanner.nextLine();
         var tokens = line.toLowerCase().split(" ");
         if (tokens.length == 1) {
+            this.ws = new WebSocketFacade(serverURL, notificationHandler);
+            // Removed unused variable gameNumberStr
             try {
                 int gameNumber = Integer.parseInt(tokens[0]);
                 if (!gameNumberToID.containsKey(gameNumber)) {
@@ -195,6 +197,9 @@ public class PostLogin {
                 if (gameName == null) {
                     throw new ResponseException(404, "Game not found with ID: " + gameID);
                 }
+
+                ws.connect(authData, gameID);
+
                 this.state = 2; // Set state to observing
                 this.gameID = gameID;
 
