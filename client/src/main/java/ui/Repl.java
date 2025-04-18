@@ -13,17 +13,12 @@ public class Repl implements NotificationHandler {
     private final PreLogin preLogin;
     private final PostLogin postLogin;
     private final GamePlay gamePlay;
-    //private int state;
-
 
     public Repl(String serverUrl) {
 
         preLogin = new PreLogin(serverUrl);
         gamePlay = new GamePlay(serverUrl, preLogin.getAuth(), this);
         postLogin = new PostLogin(serverUrl, preLogin.getAuth(), this, gamePlay);
-        //gamePlay = new GamePlay(serverUrl, postLogin.getAuth(), this);
-        //this.state = 0; // Initialize state to 0 (preLogin)
-        //gamePlay = new GamePlay(serverUrl, this.toString(), this);
     }
 
     public void run() {
@@ -36,27 +31,6 @@ public class Repl implements NotificationHandler {
         String result = "";
 
         while (!result.equals("quit")) {
-            // if (preLogin.state == 1 && !state.equals("postLogin")) {
-            //     state = "postLogin";
-            //     System.out.println("\nTransitioning to postLogin phase...");
-            //     System.out.print(postLogin.help());
-            // } else if (postLogin.state == 2 && !state.equals("gamePlay")) {
-            //     state = "gamePlay";
-            //     System.out.println("\nTransitioning to gameplay phase...");
-            //     System.out.print(gamePlay.help());
-            // }
-
-            // if (state.equals("gamePlay") && result.equals("Left the game")) {
-            //     gamePlay.state = 1;
-            //     postLogin.state = 1; // Return to postLogin state
-            //     state = "postLogin";
-            // } else if (state.equals("postLogin") && result.equals("Logged out successfully")) {
-            //     postLogin.state = 0; // Return to preLogin state
-            //     preLogin.state = 0;
-            //     System.out.print(preLogin.help());
-            //     state = "preLogin";
-            // }
-
             postLogin.authData = preLogin.getAuth();
             printPrompt();
             String line = scanner.nextLine();
@@ -84,6 +58,7 @@ public class Repl implements NotificationHandler {
                     }
                     // Transition to gamePlay if game starts
                     else if (result.matches("Observing Game: \\w+") || result.matches("Joined Game: \\d+ as \\w+")) {
+                        gamePlay.state = 2;
                         state = "gamePlay";
                         System.out.println("\nEntering gameplay phase...");
                         System.out.print(gamePlay.help());

@@ -16,7 +16,7 @@ import java.util.*;
 public class GamePlay {
     private final String serverURL;
 
-    private final ChessGame chessGame = new ChessGame();
+    private ChessGame chessGame = new ChessGame();
     private WebSocketFacade ws;
 
     public int gameID;
@@ -54,6 +54,9 @@ public class GamePlay {
         this.notificationHandler = notificationHandler;
     }
 
+    /**
+     * Sets the player's perspective (WHITE, BLACK, or OBSERVER) and prints the updated perspective.
+     */
     public void setPlayerPerspective(Perspective perspective) {
         this.playerPerspective = perspective;
         System.out.println("Player perspective set to: " + perspective);
@@ -61,6 +64,10 @@ public class GamePlay {
     }
 
 
+    /**
+     * Evaluates the input command and executes the corresponding action.
+     * Supported commands: exit, help, redraw, move, highlight, leave, resign.
+     */
     public String eval(String input) throws ResponseException {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -69,7 +76,7 @@ public class GamePlay {
             return switch (cmd) {
                 case "exit" -> exitGame();
                 case "help" -> help();
-                case "redraw" -> drawBoard(chessGame);
+                case "redraw" -> redrawBoard();
                 case "move" -> makeMove();
                 case "highlight" -> highlightMoves(chessGame);
                 case "leave" -> leaveGame();
@@ -77,10 +84,13 @@ public class GamePlay {
                 default -> "";
             };
         } catch (ResponseException ex) {
-            return "Failed! try again";
+            return "Failed! try again" + ex.getMessage();
         }
     }
 
+    /**
+     * Displays the help menu with a list of available commands.
+     */
     public String help() {
         System.out.println("\n " + SET_TEXT_BOLD + "Gameplay Help Menu");
         return """
@@ -95,12 +105,19 @@ public class GamePlay {
     }
 
 
+    /**
+     * Exits the game and sets the state to return to the post-login screen.
+     */
     public String exitGame() {
         this.state = 1; // Set state to 1 to return to postLogin
         System.out.println("Returning to postLogin.");
         return "Exited Gameplay";
     }
 
+    /**
+     * Highlights valid moves for a piece at a given position on the chessboard.
+     * Returns a visual representation of the board with highlighted moves.
+     */
     public String highlightMoves(ChessGame game) {
         System.out.println("highlight <position>");
         Scanner scanner = new Scanner(System.in);
@@ -120,10 +137,10 @@ public class GamePlay {
             result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append("\n")
                     .append("  h  g   f   e   d  c   b  a").append(RESET_BG_COLOR).append("\n");
             for (int row = 1; row <= 8; row++) {
-                final int currentRow = row;
+                int currentRow = row;
                 result.append(SET_TEXT_COLOR_WHITE).append(SET_BG_COLOR_DARK_GREY).append(row);
                 for (int col = 8; col >= 1; col--) {
-                    final int currentCol = col;
+                    int currentCol = col;
                     ChessPiece piece = board.getPiece(new ChessPosition(row, currentCol));
                     String squareColor = (row + currentCol) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_BLUE;
                     String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EMPTY;
@@ -132,9 +149,14 @@ public class GamePlay {
                     boolean isHighlighted = moves.stream()
                             .anyMatch(move -> move.getEndPosition().getRow() == currentRow &&
                                     move.getEndPosition().getColumn() == currentCol);
+                    // Check if there are no valid moves to highlight
+                    if (moves.isEmpty()) {
+                        return "no valid move";
+                    }
                     if (isHighlighted) {
                         squareColor = SET_BG_COLOR_GREEN;
                     }
+
 
                     result.append(squareColor).append(pieceSymbol).append(RESET_BG_COLOR);
                 }
@@ -158,6 +180,9 @@ public class GamePlay {
                     boolean isHighlighted = moves.stream()
                             .anyMatch(move -> move.getEndPosition().getRow() == currentRow &&
                                     move.getEndPosition().getColumn() == currentCol);
+                    if (moves.isEmpty()) {
+                        return "no valid moves";
+                    }
                     if (isHighlighted) {
                         squareColor = SET_BG_COLOR_GREEN;
                     }
@@ -172,7 +197,30 @@ public class GamePlay {
         return result.toString();
     }
 
+    /**
+     * Redraws the chessboard based on the current game state.
+     * Throws an exception if the game is not in progress.
+     */
+    private String redrawBoard() throws ResponseException {
+        System.out.println(state);
+        if (state != 2) { // Assuming state 2 represents "in game"
+            throw new ResponseException(400, "Only available in game");
+        }
+        if (ws == null) {
+            this.ws = new WebSocketFacade(serverURL, notificationHandler);
+        }
+        ws.connect(authData, gameID);
+        //System.out.println(drawBoard(chessGame)); // Redraw the board
+        return "Board redrawn";
+    }
+
+
+    /**
+     * Draws the chessboard from the perspective of the current player.
+     * Supports both WHITE and BLACK perspectives.
+     */
     public String drawBoard(ChessGame game) {
+        this.chessGame = game;
         StringBuilder result = new StringBuilder();
         ChessBoard board = game.getBoard();
 
@@ -210,6 +258,9 @@ public class GamePlay {
         return result.toString();
     }
 
+    /**
+     * Returns the symbol representation of a chess piece based on its type and team color.
+     */
     private String getPieceSymbol(ChessPiece piece) {
         switch (piece.getPieceType()) {
             case ChessPiece.PieceType.PAWN:
@@ -229,6 +280,10 @@ public class GamePlay {
         }
     }
 
+    /**
+     * Processes a move command by validating the input, sending the move to the server,
+     * and updating the local game state. Displays the updated board after the move.
+     */
     public String makeMove() throws ResponseException {
         System.out.println("move <start-position> <end-position>");
         Scanner scanner = new Scanner(System.in);
@@ -246,16 +301,28 @@ public class GamePlay {
             ChessPosition end = convertPosition(endPos);
             ChessMove move = new ChessMove(start, end, null);
 
+            // Attempt to make the move locally first
+//            try {
+//                chessGame.makeMove(move);
+//            } catch (InvalidMoveException e) {
+//                return e.getMessage();
+//            }
+
+//            // A player shouldn't be able to move a piece of the opponent
+            ChessPiece pieceAtStart = chessGame.getBoard().getPiece(start);
+//            if (pieceAtStart == null) {
+//                return "No piece at the start position!";
+//            }
+
             // Send the move to the server
             ws.makeMove(new AuthData(authData, endPos), gameID, move);
 
-            // Update the local board
-            try {
-                chessGame.makeMove(move);
-            } catch (InvalidMoveException e) {
-                return e.getMessage();
-                //return "Invalid move: " + e.getMessage();
+
+            if ((playerPerspective == Perspective.WHITE && pieceAtStart.getTeamColor() != ChessGame.TeamColor.WHITE) ||
+                    (playerPerspective == Perspective.BLACK && pieceAtStart.getTeamColor() != ChessGame.TeamColor.BLACK)) {
+                return "You cannot move your opponent's piece!";
             }
+
 
             // Display the updated board for all perspectives
             System.out.println(drawBoard(chessGame));
@@ -268,6 +335,9 @@ public class GamePlay {
         }
     }
 
+    /**
+     * Leaves the current game by notifying the server and updating the game state.
+     */
     public String leaveGame() throws ResponseException {
         this.ws = new WebSocketFacade(serverURL, notificationHandler);
         String authToken = getAuthData(); // Dynamically retrieve the auth token
@@ -277,6 +347,9 @@ public class GamePlay {
         return "Left the game";
     }
 
+    /**
+     * Handles the resignation process by confirming the player's intent and notifying the server.
+     */
     public String resignGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Are you sure you want to resign? (yes/no)");
@@ -293,6 +366,9 @@ public class GamePlay {
         }
     }
 
+    /**
+     * Converts a chessboard position string (e.g., "a1") into a ChessPosition object.
+     */
     private ChessPosition convertPosition(String positionString) {
         int row;
         int col = 0;
@@ -334,6 +410,9 @@ public class GamePlay {
         return new ChessPosition(row, col);
     }
 
+    /**
+     * Validates if a given position string (e.g., "a1") is a valid chessboard position.
+     */
     private boolean isValidPosition(String positionString) {
         if (positionString.length() != 2) {
             return false;
@@ -352,30 +431,51 @@ public class GamePlay {
         return charSet.contains(positionString.charAt(0)) && charSet.contains(positionString.charAt(1));
     }
 
+    /**
+     * Retrieves the current game ID.
+     */
     public int getGameID() {
         return gameID;
     }
 
+    /**
+     * Sets the current game ID.
+     */
     public void setGameID(int gameID) {
         this.gameID = gameID;
     }
 
+    /**
+     * Retrieves the current game state.
+     */
     public int getState() {
         return state;
     }
 
+    /**
+     * Sets the current game state.
+     */
     public void setState(int state) {
         this.state = state;
     }
 
+    /**
+     * Retrieves the authentication data for the current session.
+     */
     public String getAuthData() {
         return authData;
     }
 
+    /**
+     * Sets the authentication data for the current session.
+     */
     public void setAuthData(String authData) {
         this.authData = authData;
     }
 
+    /**
+     * Retrieves the player's current perspective (WHITE, BLACK, or OBSERVER).
+     */
     public Perspective getPlayerPerspective() {
         return playerPerspective;
     }

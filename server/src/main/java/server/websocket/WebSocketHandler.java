@@ -108,6 +108,15 @@ public class WebSocketHandler {
         ChessMove move = command.getMove();
         ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
 
+        if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
+            try {
+                connections.sendError(auth, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: game is over"));
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+            return;
+        }
+
         if ((game.getTeamTurn() == ChessGame.TeamColor.WHITE && !(Objects.equals(gameData.whiteUsername(), username))) ||
                 (game.getTeamTurn() == ChessGame.TeamColor.BLACK && !(Objects.equals(gameData.blackUsername(), username)))) {
             try {
@@ -118,14 +127,6 @@ public class WebSocketHandler {
             return;
         }
 
-        if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
-            try {
-                connections.sendError(auth, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: game is over"));
-            } catch (IOException e) {
-                throw new ResponseException(500, e.getMessage());
-            }
-            return;
-        }
 
         try {
             game.makeMove(move);
@@ -158,22 +159,22 @@ public class WebSocketHandler {
             connections.sendLoadCommand(gameID, loadGameMessage);
 
             if (isBlackInCheckmate) {
-                game.setTeamTurn(null);
+                game.setTeamTurn(ChessGame.TeamColor.NONE);
                 setGame(gameID, new AuthData(auth, username), game);
-                var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!");
+                var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("Black is in checkmate! Player %s is under threat.", gameData.blackUsername()));
                 connections.broadcast(gameID, null, endGameNotification);
             } else if (isWhiteInCheckmate) {
-                game.setTeamTurn(null);
+                game.setTeamTurn(ChessGame.TeamColor.NONE);
                 setGame(gameID, new AuthData(auth, username), game);
-                var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!");
+                var endGameNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("White is in checkmate! Player %s is under threat.", gameData.whiteUsername()));
                 connections.broadcast(gameID, null, endGameNotification);
             } else {
                 if (isBlackInCheck) {
-                    var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black is in check!");
+                    var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("Black is in check! Player %s is under threat.", gameData.blackUsername()));
                     connections.broadcast(gameID, null, checkNotification);
                 }
                 if (isWhiteInCheck) {
-                    var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White is in check!");
+                    var checkNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("White is in check! Player %s is under threat.", gameData.whiteUsername()));
                     connections.broadcast(gameID, null, checkNotification);
                 }
             }
@@ -292,10 +293,10 @@ public class WebSocketHandler {
             throw new ResponseException(401, "Unauthorized to update this game");
         }
 
-        // Validate if the game is in progress
-        if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
-            throw new ResponseException(400, "Game is already over");
-        }
+//        // Validate if the game is in progress
+//        if (game.getTeamTurn() == ChessGame.TeamColor.NONE) {
+//            throw new ResponseException(400, "Game is already over");
+//        }
 
         // Update the game in the service
         gameService.updateGame(new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
