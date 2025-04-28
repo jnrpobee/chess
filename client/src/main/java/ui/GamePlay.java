@@ -301,18 +301,8 @@ public class GamePlay {
             ChessPosition end = convertPosition(endPos);
             ChessMove move = new ChessMove(start, end, null);
 
-            // Attempt to make the move locally first
-//            try {
-//                chessGame.makeMove(move);
-//            } catch (InvalidMoveException e) {
-//                return e.getMessage();
-//            }
-
 //            // A player shouldn't be able to move a piece of the opponent
             ChessPiece pieceAtStart = chessGame.getBoard().getPiece(start);
-//            if (pieceAtStart == null) {
-//                return "No piece at the start position!";
-//            }
 
             // Send the move to the server
             ws.makeMove(new AuthData(authData, endPos), gameID, move);
@@ -322,7 +312,6 @@ public class GamePlay {
                     (playerPerspective == Perspective.BLACK && pieceAtStart.getTeamColor() != ChessGame.TeamColor.BLACK)) {
                 return "You cannot move your opponent's piece!";
             }
-
 
             // Display the updated board for all perspectives
             System.out.println(drawBoard(chessGame));
